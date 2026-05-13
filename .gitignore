@@ -41,3 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# Claude Code
+AGENTS.md
+CLAUDE.md
+
+# Local DB
+prisma/dev.db
