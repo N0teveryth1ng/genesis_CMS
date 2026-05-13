@@ -270,7 +270,7 @@ export default function ApiKeysClient({ keys }: { keys: ApiKey[] }) {
         </div>
         <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
           Base URL: <code className="font-mono px-1 rounded" style={{ background: "var(--bg-raised)", color: "var(--text)" }}>
-            http://localhost:3000/api/v1/&lt;collection-name&gt;
+            {typeof window !== "undefined" ? window.location.origin : ""}/api/v1/&lt;collection-name&gt;
           </code>
         </p>
       </div>
