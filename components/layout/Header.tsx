@@ -7,10 +7,12 @@ import Link from "next/link";
 import {
   Search, Bell, ChevronRight, User, LogOut,
   Settings, ChevronsUpDown, Menu, Sun, Moon, Command,
-  Check, Info, AlertTriangle,
+  Plus, Edit2, Trash2, Database, Users, Globe, FolderOpen, Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
+import { getAuditLogs } from "@/lib/actions/audit";
+import type { AuditLogEntry } from "@/lib/actions/audit";
 
 /* ── Breadcrumbs ───────────────────────────────────────────── */
 const LABEL_MAP: Record<string, string> = {
@@ -112,16 +114,54 @@ function ThemeToggle() {
   );
 }
 
-/* ── Mock notifications ────────────────────────────────────── */
-const NOTIFS = [
-  { id: 1, icon: Check,         color: "var(--success)", title: "Migration completed",      time: "2m ago",  read: false },
-  { id: 2, icon: Info,          color: "var(--info)",    title: "New user registered",      time: "1h ago",  read: false },
-  { id: 3, icon: AlertTriangle, color: "var(--warning)", title: "Flow execution skipped",   time: "3h ago",  read: true  },
-];
+/* ── Notification helpers ──────────────────────────────────── */
+const ACTION_COLOR: Record<string, string> = {
+  create: "var(--success)",
+  update: "var(--info)",
+  delete: "var(--danger)",
+};
+const ACTION_ICON: Record<string, React.ElementType> = {
+  create: Plus, update: Edit2, delete: Trash2,
+};
+const RESOURCE_ICON: Record<string, React.ElementType> = {
+  record: Database, collection: Database, user: Users,
+  webhook: Globe, api_key: Key, file: FolderOpen,
+};
+
+function timeAgo(date: Date): string {
+  const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (diff < 60)   return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400)return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+function notifTitle(log: AuditLogEntry): string {
+  let meta: Record<string, unknown> = {};
+  try { meta = log.meta ? JSON.parse(log.meta) : {}; } catch { /* empty */ }
+  const res = log.resource.replace("_", " ");
+  const act = log.action;
+  if (log.resource === "record") return `Record ${act}d in ${meta.collectionName ?? "collection"}`;
+  if (log.resource === "collection") return `Collection "${meta.label ?? meta.name ?? ""}" ${act}d`;
+  if (log.resource === "user")    return `User ${meta.email ?? ""} ${act}d`;
+  if (log.resource === "webhook") return `Webhook "${meta.name ?? ""}" ${act}d`;
+  return `${res} ${act}d`;
+}
 
 function NotificationBell() {
-  const [open, setOpen] = useState(false);
-  const unread = NOTIFS.filter((n) => !n.read).length;
+  const [open, setOpen]     = useState(false);
+  const [logs, setLogs]     = useState<AuditLogEntry[]>([]);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    getAuditLogs(1, 6).then(({ logs }) => setLogs(logs));
+  }, []);
+
+  const unread = logs.filter((l) => !readIds.has(l.id)).length;
+
+  function markAllRead() {
+    setReadIds(new Set(logs.map((l) => l.id)));
+  }
 
   return (
     <div className="relative">
@@ -153,49 +193,58 @@ function NotificationBell() {
           >
             <div className="flex items-center justify-between px-4 py-3 border-b"
               style={{ borderColor: "var(--border)" }}>
-              <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                Notifications
-              </p>
-              <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{ background: "var(--primary-dim)", color: "var(--primary)" }}
-              >
-                {unread} new
-              </span>
+              <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Activity</p>
+              {unread > 0 && (
+                <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                  style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
+                  {unread} new
+                </span>
+              )}
             </div>
 
-            <div className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
-              {NOTIFS.map(({ id, icon: Icon, color, title, time, read }) => (
-                <div
-                  key={id}
-                  className={cn("flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors")}
-                  style={{
-                    background: read ? "transparent" : "var(--primary-muted)",
-                    color: "var(--text-soft)",
-                  }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg-overlay)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = read ? "transparent" : "var(--primary-muted)"; }}
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: `${color}18`, color }}>
-                    <Icon size={13} />
+            <div className="flex flex-col divide-y max-h-72 overflow-y-auto" style={{ borderColor: "var(--border)" }}>
+              {logs.length === 0 ? (
+                <p className="text-xs text-center py-8" style={{ color: "var(--text-muted)" }}>No activity yet</p>
+              ) : logs.map((log) => {
+                const read    = readIds.has(log.id);
+                const color   = ACTION_COLOR[log.action] ?? "var(--info)";
+                const ResIcon = RESOURCE_ICON[log.resource] ?? Database;
+                return (
+                  <div
+                    key={log.id}
+                    className={cn("flex items-start gap-3 px-4 py-3 cursor-pointer")}
+                    style={{ background: read ? "transparent" : "var(--primary-muted)" }}
+                    onClick={() => setReadIds((s) => new Set([...s, log.id]))}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "var(--bg-overlay)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = read ? "transparent" : "var(--primary-muted)"; }}
+                  >
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ background: `${color}18`, color }}>
+                      <ResIcon size={13} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm truncate" style={{ color: "var(--text)" }}>{notifTitle(log)}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                        {log.userEmail ?? "system"} · {timeAgo(log.createdAt)}
+                      </p>
+                    </div>
+                    {!read && (
+                      <div className="w-2 h-2 rounded-full mt-1.5 shrink-0"
+                        style={{ background: "var(--primary)" }} />
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate" style={{ color: "var(--text)" }}>{title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{time}</p>
-                  </div>
-                  {!read && (
-                    <div className="w-2 h-2 rounded-full mt-1.5 shrink-0"
-                      style={{ background: "var(--primary)" }} />
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            <div className="px-4 py-2.5 border-t text-center" style={{ borderColor: "var(--border)" }}>
-              <button className="text-xs font-medium" style={{ color: "var(--primary)" }}>
+            <div className="px-4 py-2.5 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+              <button onClick={markAllRead} className="text-xs font-medium" style={{ color: "var(--primary)" }}>
                 Mark all as read
               </button>
+              <Link href="/audit" onClick={() => setOpen(false)}
+                className="text-xs" style={{ color: "var(--text-muted)" }}>
+                View all →
+              </Link>
             </div>
           </div>
         </>
@@ -251,8 +300,8 @@ function UserMenu() {
             </div>
 
             {[
-              { icon: User,     label: "Profile",  href: "#"         },
-              { icon: Settings, label: "Settings", href: "/settings" },
+              { icon: User,     label: "Profile",  href: "/settings?tab=account"  },
+              { icon: Settings, label: "Settings", href: "/settings"              },
             ].map(({ icon: Icon, label, href }) => (
               <Link
                 key={label}
