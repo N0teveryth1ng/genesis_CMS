@@ -1,0 +1,19 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getCollection } from "@/lib/actions/collections";
+import CollectionDetailClient from "./_components/CollectionDetailClient";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const col = await getCollection(id);
+  return { title: col ? col.label : "Collection" };
+}
+
+export default async function CollectionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const collection = await getCollection(id);
+  if (!collection) notFound();
+  return <CollectionDetailClient collection={collection} />;
+}

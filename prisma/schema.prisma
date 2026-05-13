@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("viewer")
+  avatar    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String   @unique  // slug: "blog_posts"
+  label       String            // display: "Blog Posts"
+  icon        String   @default("Database")
+  description String?
+  fields      Field[]
+  records     Record[]
+  permissions Permission[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Field {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  name         String     // slug: "title"
+  label        String     // display: "Title"
+  type         String     // text | textarea | number | boolean | date | datetime | email | url | password | select | json | uuid
+  required     Boolean    @default(false)
+  unique       Boolean    @default(false)
+  hidden       Boolean    @default(false)
+  defaultValue String?
+  options      String?    // JSON string (for select: [{label,value}])
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([collectionId, name])
+}
+
+model Record {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  data         String     // JSON blob of field values
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model File {
+  id           String   @id @default(cuid())
+  name         String
+  size         Int
+  mime         String
+  path         String   // relative path under public/uploads/
+  url          String   // public URL
+  thumbnailUrl String?  // auto-generated 400px-wide thumbnail for images
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  userEmail  String?
+  action     String   // "create" | "update" | "delete"
+  resource   String   // "record" | "collection" | "user" | "webhook" | "api_key" | "file"
+  resourceId String?
+  meta       String?  // JSON: { collectionName, label, ... }
+  createdAt  DateTime @default(now())
+}
+
+model Webhook {
+  id           String    @id @default(cuid())
+  name         String
+  url          String
+  events       String    // JSON array: ["record.create","record.update","record.delete"]
+  collectionId String?   // null = all collections
+  secret       String?   // used to sign the payload
+  active       Boolean   @default(true)
+  lastFiredAt  DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+model Permission {
+  id           String     @id @default(cuid())
+  role         String     // "editor" | "viewer"
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  canRead      Boolean    @default(true)
+  canCreate    Boolean    @default(false)
+  canUpdate    Boolean    @default(false)
+  canDelete    Boolean    @default(false)
+
+  @@unique([role, collectionId])
+}
+
+model Settings {
+  id          String  @id @default("singleton")
+  siteName    String  @default("Genesis CMS")
+  description String  @default("")
+  logoUrl     String  @default("")
+  timezone    String  @default("UTC")
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  keyHash     String    @unique
+  prefix      String
+  permissions String    @default("read")  // "read" | "read_write"
+  active      Boolean   @default(true)
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
