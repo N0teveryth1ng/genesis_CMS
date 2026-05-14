@@ -1,6 +1,13 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getPageBySlug } from "@/lib/actions/pages";
 import type { Block } from "@/app/(dashboard)/pages/_components/PageEditor";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const page = await getPageBySlug(slug);
+  return { title: page?.seoTitle ?? page?.title ?? slug };
+}
 
 /* ── Block renderers ─────────────────────────────────────── */
 function HeroBlock({ data }: { data: Record<string, string> }) {
@@ -114,24 +121,15 @@ export default async function SitePage({
   try { blocks = JSON.parse(page.blocks) as Block[]; } catch { /* empty */ }
 
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{page.seoTitle ?? page.title}</title>
-        {page.seoDesc && <meta name="description" content={page.seoDesc} />}
-        <style>{`*, *::before, *::after { box-sizing: border-box; } body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; }`}</style>
-      </head>
-      <body>
-        {blocks.map((block) => (
-          <RenderBlock key={block.id} block={block} />
-        ))}
-        {blocks.length === 0 && (
-          <div style={{ textAlign: "center", padding: "120px 24px", color: "#9ca3af" }}>
-            <p style={{ fontSize: "1.125rem" }}>This page has no content yet.</p>
-          </div>
-        )}
-      </body>
-    </html>
+    <main style={{ margin: 0, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: "#fff", minHeight: "100vh" }}>
+      {blocks.map((block) => (
+        <RenderBlock key={block.id} block={block} />
+      ))}
+      {blocks.length === 0 && (
+        <div style={{ textAlign: "center", padding: "120px 24px", color: "#9ca3af" }}>
+          <p style={{ fontSize: "1.125rem" }}>This page has no content yet.</p>
+        </div>
+      )}
+    </main>
   );
 }
