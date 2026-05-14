@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mendis Live Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 60px auto; padding: 0 20px; }
+    h2 { color: #333; }
+    p  { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Content from Genesis CMS</h1>
+  <div id="content">Loading…</div>
+
+  <script>
+    fetch("https://genesis-cms-oc80.onrender.com/api/v1/mendis", {
+      headers: { "Authorization": "Bearer gen_ro_3a736533fa02d9ea4d6b589011663074cb525a90543c9345" }
+    })
+    .then(r => r.json())
+    .then(({ data }) => {
+      document.getElementById("content").innerHTML =
+        data.map(item => `<h2>${item.lola}</h2><p>${item.nexa}</p>`).join("")
+    })
+    .catch(() => {
+      document.getElementById("content").textContent = "Error loading content."
+    })
+  </script>
+</body>
+</html>

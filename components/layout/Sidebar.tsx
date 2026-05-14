@@ -5,18 +5,19 @@ import { usePathname } from "next/navigation";
 import {
   LayoutGrid, Database, FolderOpen, Users, Settings,
   Zap, BarChart2, ChevronLeft, ChevronRight, Globe,
-  Shield, Key, HelpCircle, X, ClipboardList,
+  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
 
 /* ── Nav data ──────────────────────────────────────────────── */
 const NAV_MAIN = [
-  { label: "Overview",    href: "/",           icon: LayoutGrid },
-  { label: "Collections", href: "/collections", icon: Database   },
-  { label: "Files",       href: "/files",       icon: FolderOpen },
-  { label: "Flows",       href: "/flows",       icon: Zap        },
-  { label: "Insights",    href: "/insights",    icon: BarChart2  },
+  { label: "Overview",    href: "/",           icon: LayoutGrid   },
+  { label: "Collections", href: "/collections", icon: Database     },
+  { label: "Pages",       href: "/pages",       icon: LayoutTemplate },
+  { label: "Files",       href: "/files",       icon: FolderOpen   },
+  { label: "Flows",       href: "/flows",       icon: Zap          },
+  { label: "Insights",    href: "/insights",    icon: BarChart2    },
 ];
 
 const NAV_SYSTEM = [
