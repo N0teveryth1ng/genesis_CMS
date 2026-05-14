@@ -5,6 +5,17 @@ import { fireWebhooks } from "@/lib/actions/webhooks";
 
 export const runtime = "nodejs";
 
+/* ── CORS ────────────────────────────────────────────────── */
+const CORS = {
+  "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type",
+};
+
+export function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 /* ── Auth helper ─────────────────────────────────────────── */
 async function authenticate(req: NextRequest) {
   const auth = req.headers.get("authorization") ?? "";
@@ -82,7 +93,7 @@ export async function GET(
     return { id: r.id, ...parsed, createdAt: r.createdAt, updatedAt: r.updatedAt };
   }));
 
-  return NextResponse.json({ data, meta: { total, page, limit, pages: Math.ceil(total / limit) } });
+  return NextResponse.json({ data, meta: { total, page, limit, pages: Math.ceil(total / limit) } }, { headers: CORS });
 }
 
 /* ── POST /api/v1/[collection] — create record ───────────── */
@@ -123,6 +134,6 @@ export async function POST(
   fireWebhooks("record.create", col.id, col.name, { id: record.id, ...body }).catch(() => {});
   return NextResponse.json(
     { data: { id: record.id, ...parsed, createdAt: record.createdAt, updatedAt: record.updatedAt } },
-    { status: 201 }
+    { status: 201, headers: CORS }
   );
 }
