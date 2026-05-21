@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCollection } from "@/lib/actions/collections";
+import { getCollection, getCollections } from "@/lib/actions/collections";
 import { getGitCollection } from "@/lib/actions/git";
+import { getRelations } from "@/lib/actions/relations";
 import CollectionDetailClient from "./_components/CollectionDetailClient";
 
 export const dynamic = "force-dynamic";
@@ -14,8 +15,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function CollectionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const collection = id.startsWith("git-") ? await getGitCollection(id) : await getCollection(id);
-  if (!collection) notFound();
-  return <CollectionDetailClient collection={collection as any} />;
-}
+  const isGit = id.startsWith("git-");
 
+  const [collection, allCollections] = await Promise.all([
+    isGit ? getGitCollection(id) : getCollection(id),
+    isGit ? Promise.resolve([]) : getCollections(),
+  ]);
+
+  if (!collection) notFound();
+
+  const relations = isGit ? [] : await getRelations(id);
+
+  return (
+    <CollectionDetailClient
+      collection={collection as any}
+      relations={relations}
+      allCollections={allCollections.map((c) => ({ id: c.id, name: c.name, label: c.label }))}
+    />
+  );
+}

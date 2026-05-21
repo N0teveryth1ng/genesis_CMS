@@ -11,8 +11,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import FieldBuilder from "@/components/collections/FieldBuilder";
+import RelationsSection from "./RelationsSection";
 import { deleteField } from "@/lib/actions/collections";
 import type { Collection, Field } from "@prisma/client";
+import type { RelationWithCollections } from "@/lib/actions/relations";
 
 /* ── Icon resolver ───────────────────────────────────────── */
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -38,6 +40,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 type CollectionWithFields = Collection & { fields: Field[]; isGitBacked?: boolean };
+type CollectionOption    = { id: string; name: string; label: string };
 
 /* ── Field row ───────────────────────────────────────────── */
 function FieldRow({
@@ -114,7 +117,7 @@ function FieldRow({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 min-w-[80px] justify-end">
+      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 min-w-20 justify-end">
         {isGit ? (
           <span title="Managed in Git schema">
             <Lock size={12} style={{ color: "var(--text-muted)" }} />
@@ -150,8 +153,12 @@ function FieldRow({
 /* ── Collection detail client ────────────────────────────── */
 export default function CollectionDetailClient({
   collection,
+  relations = [],
+  allCollections = [],
 }: {
-  collection: CollectionWithFields;
+  collection:      CollectionWithFields;
+  relations?:      RelationWithCollections[];
+  allCollections?: CollectionOption[];
 }) {
   const [fieldBuilder, setFieldBuilder] = useState<Field | null | "new">(null);
   const CollIcon = ICON_MAP[collection.icon] ?? Database;
@@ -284,12 +291,12 @@ export default function CollectionDetailClient({
               <p className="text-sm font-medium" style={{ color: "var(--text)" }}>{label}</p>
               <p className="text-[11px] font-mono" style={{ color: "var(--text-muted)" }}>{name}</p>
             </div>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full w-[120px]"
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full w-30"
               style={{ background: "var(--bg-overlay)", color: "var(--text-muted)" }}>
               {type}
             </span>
-            <span className="text-[11px] w-[80px]" style={{ color: "var(--text-muted)" }}>{note}</span>
-            <div className="w-[80px]">
+            <span className="text-[11px] w-20" style={{ color: "var(--text-muted)" }}>{note}</span>
+            <div className="w-20">
               <Lock size={12} style={{ color: "var(--text-muted)" }} />
             </div>
           </div>
@@ -322,6 +329,16 @@ export default function CollectionDetailClient({
           ))
         )}
       </div>
+
+      {/* Relationships */}
+      {!isGit && (
+        <RelationsSection
+          collectionId={collection.id}
+          collectionLabel={collection.label}
+          relations={relations}
+          allCollections={allCollections}
+        />
+      )}
 
       {/* Field builder modal */}
       {fieldBuilder !== null && (

@@ -7,6 +7,7 @@ import {
   insertDynamicRow,
   getDynamicRow,
 } from "@/lib/db-dynamic";
+import { getRelations } from "@/lib/actions/relations";
 
 export const runtime = "nodejs";
 
@@ -67,23 +68,28 @@ export async function GET(
   if (col.tableName) {
     const { records, total } = await queryDynamicRows(col.tableName, col.id, page, limit);
 
+    // Fetch M2O relations for populate
+    const m2oRelations = populate
+      ? (await getRelations(col.id)).filter((r) => r.type === "m2o" && r.collectionId === col.id)
+      : [];
+
     const data = await Promise.all(records.map(async (r) => {
       let parsed: Record<string, unknown> = {};
       try { parsed = JSON.parse(r.data); } catch { /* empty */ }
 
-      if (populate) {
-        const relationFields = col.fields.filter((f) => f.type === "relation");
-        for (const f of relationFields) {
-          const val = parsed[f.name];
-          if (!val) continue;
+      if (populate && m2oRelations.length > 0) {
+        for (const rel of m2oRelations) {
+          const fkVal = parsed[rel.fieldName];
+          if (!fkVal) continue;
           try {
-            const ids = Array.isArray(val) ? val as string[] : [val as string];
-            const related = await db.record.findMany({ where: { id: { in: ids } } });
-            parsed[f.name] = related.map((rr) => {
-              let d: Record<string, unknown> = {};
-              try { d = JSON.parse(rr.data); } catch { /* empty */ }
-              return { id: rr.id, ...d };
-            });
+            if (rel.relatedCollection.tableName) {
+              const relRow = await getDynamicRow(rel.relatedCollection.tableName, rel.relatedCollectionId, String(fkVal));
+              if (relRow) {
+                let d: Record<string, unknown> = {};
+                try { d = JSON.parse(relRow.data); } catch { /* empty */ }
+                parsed[rel.fieldName] = { id: relRow.id, ...d };
+              }
+            }
           } catch { /* skip */ }
         }
       }

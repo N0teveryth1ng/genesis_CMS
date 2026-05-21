@@ -68,6 +68,25 @@ export async function dropDynamicColumn(
   );
 }
 
+export async function createJunctionTable(
+  junctionTable: string,
+  colAField: string,  // e.g. "post_id"
+  colBField: string,  // e.g. "tag_id"
+): Promise<void> {
+  await db.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS ${ident(junctionTable)} (
+      "id"       TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      ${ident(colAField)} TEXT NOT NULL,
+      ${ident(colBField)} TEXT NOT NULL,
+      UNIQUE (${ident(colAField)}, ${ident(colBField)})
+    )
+  `);
+}
+
+export async function dropJunctionTable(junctionTable: string): Promise<void> {
+  await db.$executeRawUnsafe(`DROP TABLE IF EXISTS ${ident(junctionTable)}`);
+}
+
 // ── Shared return shape ───────────────────────────────────────
 
 type DynRecord = {

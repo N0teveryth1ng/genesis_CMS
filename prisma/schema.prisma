@@ -29,6 +29,8 @@ model Collection {
   fields      Field[]
   records     Record[]
   permissions Permission[]
+  relationsOwned    Relation[] @relation("RelOwner")
+  relationsTargeted Relation[] @relation("RelTarget")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -137,6 +139,25 @@ model Page {
   seoDesc     String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Relation {
+  id                  String     @id @default(cuid())
+  type                String     // "m2o" | "o2m" | "m2m"
+
+  collectionId        String
+  collection          Collection @relation("RelOwner",  fields: [collectionId],        references: [id], onDelete: Cascade)
+  fieldName           String     // FK column name in owning table (e.g. "author_id")
+
+  relatedCollectionId String
+  relatedCollection   Collection @relation("RelTarget", fields: [relatedCollectionId], references: [id], onDelete: Cascade)
+  relatedFieldName    String     @default("id")
+
+  junctionTable       String?    // M2M only: "genesis_jxn_{a}_{b}"
+
+  createdAt           DateTime   @default(now())
+
+  @@unique([collectionId, fieldName])
 }
 
 model GitIntegration {
