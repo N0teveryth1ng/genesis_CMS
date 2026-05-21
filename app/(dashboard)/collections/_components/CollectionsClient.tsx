@@ -6,9 +6,10 @@ import {
   Plus, Database, FileText, Users, Image, ShoppingCart,
   Tag, Mail, Calendar, Globe, BarChart2, Bookmark,
   MessageSquare, Package, Star, Heart, Zap, Music,
-  Trash2, ArrowRight, Loader2, GitBranch,
+  Trash2, ArrowRight, Loader2, GitBranch, HardDrive,
 } from "lucide-react";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
+import IntrospectModal from "./IntrospectModal";
 import { deleteCollection } from "@/lib/actions/collections";
 import type { Collection } from "@prisma/client";
 
@@ -45,6 +46,9 @@ function CollectionCard({
   }
 
   const isGit = !!collection.isGitBacked;
+  // DB-imported: has a tableName but it doesn't start with "genesis_col_" (external table)
+  const isDbImported = !isGit && !!(collection as Collection & { tableName?: string | null }).tableName &&
+    !(collection as Collection & { tableName?: string | null }).tableName?.startsWith("genesis_col_");
 
   return (
     <div
@@ -60,17 +64,22 @@ function CollectionCard({
         setConfirming(false);
       }}
     >
-      {/* Git Badge or Delete */}
+      {/* Git / DB Badge */}
       {isGit ? (
         <span className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase transition-all"
           style={{ background: "rgba(0,184,217,0.15)", color: "#00B8D9", border: "1px solid rgba(0,184,217,0.2)" }}>
           <GitBranch size={9} /> Git-Sync
         </span>
+      ) : isDbImported ? (
+        <span className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase"
+          style={{ background: "rgba(129,199,132,0.15)", color: "#81c784", border: "1px solid rgba(129,199,132,0.25)" }}>
+          <HardDrive size={9} /> DB Import
+        </span>
       ) : null}
 
       {/* Icon */}
       <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-        style={{ background: isGit ? "rgba(0,184,217,0.1)" : "var(--primary-dim)", color: isGit ? "#00B8D9" : "var(--primary)" }}>
+        style={{ background: isGit ? "rgba(0,184,217,0.1)" : isDbImported ? "rgba(129,199,132,0.1)" : "var(--primary-dim)", color: isGit ? "#00B8D9" : isDbImported ? "#81c784" : "var(--primary)" }}>
         <CollectionIcon name={collection.icon} size={20} />
       </div>
 
@@ -128,7 +137,8 @@ export default function CollectionsClient({
 }: {
   collections: CollectionWithCount[];
 }) {
-  const [showCreate, setShowCreate] = useState(false);
+  const [showCreate, setShowCreate]         = useState(false);
+  const [showIntrospect, setShowIntrospect] = useState(false);
 
   return (
     <div className="p-6 max-w-6xl mx-auto flex flex-col gap-6">
@@ -140,13 +150,22 @@ export default function CollectionsClient({
             {collections.length} collection{collections.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer"
-          style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
-        >
-          <Plus size={15} /> New Collection
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowIntrospect(true)}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer"
+            style={{ background: "var(--bg-raised)", color: "var(--text-soft)", border: "1px solid var(--border)" }}
+          >
+            <HardDrive size={14} /> Import from DB
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer"
+            style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
+          >
+            <Plus size={15} /> New Collection
+          </button>
+        </div>
       </div>
 
       {/* Grid */}
@@ -207,8 +226,9 @@ export default function CollectionsClient({
         </div>
       )}
 
-      {/* Modal */}
-      {showCreate && <CreateCollectionModal onClose={() => setShowCreate(false)} />}
+      {/* Modals */}
+      {showCreate      && <CreateCollectionModal onClose={() => setShowCreate(false)} />}
+      {showIntrospect  && <IntrospectModal       onClose={() => setShowIntrospect(false)} />}
     </div>
   );
 }
