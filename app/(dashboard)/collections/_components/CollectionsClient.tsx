@@ -6,7 +6,7 @@ import {
   Plus, Database, FileText, Users, Image, ShoppingCart,
   Tag, Mail, Calendar, Globe, BarChart2, Bookmark,
   MessageSquare, Package, Star, Heart, Zap, Music,
-  Trash2, ArrowRight, Loader2,
+  Trash2, ArrowRight, Loader2, GitBranch,
 } from "lucide-react";
 import CreateCollectionModal from "@/components/collections/CreateCollectionModal";
 import { deleteCollection } from "@/lib/actions/collections";
@@ -28,7 +28,7 @@ function CollectionCard({
   collection,
   fieldCount,
 }: {
-  collection: Collection;
+  collection: Collection & { isGitBacked?: boolean };
   fieldCount: number;
 }) {
   const router = useRouter();
@@ -44,9 +44,11 @@ function CollectionCard({
     });
   }
 
+  const isGit = !!collection.isGitBacked;
+
   return (
     <div
-      className="group relative rounded-xl p-5 cursor-pointer transition-all duration-150"
+      className="group relative rounded-xl p-5 cursor-pointer transition-all duration-150 animate-fade-in"
       style={{
         background: "var(--bg-surface)",
         border:     "1px solid var(--border)",
@@ -58,9 +60,17 @@ function CollectionCard({
         setConfirming(false);
       }}
     >
+      {/* Git Badge or Delete */}
+      {isGit ? (
+        <span className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase transition-all"
+          style={{ background: "rgba(0,184,217,0.15)", color: "#00B8D9", border: "1px solid rgba(0,184,217,0.2)" }}>
+          <GitBranch size={9} /> Git-Sync
+        </span>
+      ) : null}
+
       {/* Icon */}
       <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
-        style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
+        style={{ background: isGit ? "rgba(0,184,217,0.1)" : "var(--primary-dim)", color: isGit ? "#00B8D9" : "var(--primary)" }}>
         <CollectionIcon name={collection.icon} size={20} />
       </div>
 
@@ -84,20 +94,25 @@ function CollectionCard({
 
       {/* Actions — visible on hover */}
       <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all"
-          style={{
-            background: confirming ? "var(--danger)" : "var(--bg-overlay)",
-            color:      confirming ? "#fff"          : "var(--text-muted)",
-          }}
-        >
-          {isPending ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
-          {confirming ? "Confirm" : "Delete"}
-        </button>
+        {!isGit && (
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+            style={{
+              background: confirming ? "var(--danger)" : "var(--bg-overlay)",
+              color:      confirming ? "#fff"          : "var(--text-muted)",
+            }}
+          >
+            {isPending ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
+            {confirming ? "Confirm" : "Delete"}
+          </button>
+        )}
         <div className="w-6 h-6 rounded-md flex items-center justify-center"
-          style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
+          style={{
+            background: isGit ? "rgba(0,184,217,0.2)" : "var(--primary-dim)",
+            color:      isGit ? "#00B8D9"             : "var(--primary)"
+          }}>
           <ArrowRight size={12} />
         </div>
       </div>
@@ -106,7 +121,7 @@ function CollectionCard({
 }
 
 /* ── Collections client page ─────────────────────────────── */
-type CollectionWithCount = Collection & { _count: { fields: number } };
+type CollectionWithCount = Collection & { _count: { fields: number }; isGitBacked?: boolean };
 
 export default function CollectionsClient({
   collections,
@@ -127,7 +142,7 @@ export default function CollectionsClient({
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
+          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all cursor-pointer"
           style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
         >
           <Plus size={15} /> New Collection
@@ -152,14 +167,14 @@ export default function CollectionsClient({
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="mt-2 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold"
+            className="mt-2 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold cursor-pointer"
             style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
           >
             <Plus size={14} /> Create your first collection
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
           {collections.map((c) => (
             <CollectionCard
               key={c.id}
@@ -170,7 +185,7 @@ export default function CollectionsClient({
           {/* Add more card */}
           <button
             onClick={() => setShowCreate(true)}
-            className="rounded-xl p-5 flex flex-col items-center justify-center gap-2 transition-all duration-150 border-dashed"
+            className="rounded-xl p-5 flex flex-col items-center justify-center gap-2 transition-all duration-150 border-dashed cursor-pointer"
             style={{
               background:  "transparent",
               border:      "2px dashed var(--border)",
@@ -197,3 +212,4 @@ export default function CollectionsClient({
     </div>
   );
 }
+

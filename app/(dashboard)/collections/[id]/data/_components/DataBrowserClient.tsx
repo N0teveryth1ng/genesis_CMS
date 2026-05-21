@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { deleteRecord, getRecords } from "@/lib/actions/collections";
+import { deleteGitRecord, getGitRecords } from "@/lib/actions/git";
 import RecordFormModal from "./RecordFormModal";
 import type { Collection, Field, Record as PrismaRecord } from "@prisma/client";
 
@@ -20,7 +21,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   MessageSquare, Package, Star, Heart, Zap, Music,
 };
 
-type CollectionWithFields = Collection & { fields: Field[] };
+type CollectionWithFields = Collection & { fields: Field[]; isGitBacked?: boolean };
 
 type FlatRecord = {
   id: string;
@@ -67,7 +68,11 @@ function DeleteRowButton({ recordId, collectionId }: { recordId: string; collect
     e.stopPropagation();
     if (!confirming) { setConfirming(true); return; }
     startTransition(async () => {
-      await deleteRecord(recordId, collectionId);
+      if (collectionId.startsWith("git-")) {
+        await deleteGitRecord(recordId, collectionId);
+      } else {
+        await deleteRecord(recordId, collectionId);
+      }
       router.refresh();
     });
   }
@@ -77,7 +82,7 @@ function DeleteRowButton({ recordId, collectionId }: { recordId: string; collect
       onClick={handleClick}
       disabled={isPending}
       onMouseLeave={() => setConfirming(false)}
-      className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all"
+      className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
       style={{
         background: confirming ? "var(--danger)" : "var(--bg-raised)",
         color:      confirming ? "#fff"          : "var(--danger)",
@@ -107,6 +112,7 @@ export default function DataBrowserClient({
 }) {
   const router = useRouter();
   const CollIcon = ICON_MAP[collection.icon] ?? Database;
+  const isGit = !!collection.isGitBacked;
 
   const visibleFields = collection.fields.filter((f) => !f.hidden);
   const [records, setRecords] = useState<FlatRecord[]>(initialRecords.map(flattenRecord));
@@ -118,11 +124,14 @@ export default function DataBrowserClient({
 
   function goToPage(p: number) {
     startPageTransition(async () => {
-      const res = await getRecords(collection.id, p, pageSize);
+      const res = isGit
+        ? await getGitRecords(collection.id, p, pageSize)
+        : await getRecords(collection.id, p, pageSize);
       setRecords(res.records.map(flattenRecord));
       setPage(p);
     });
   }
+
 
   return (
     <div className="p-6 max-w-7xl mx-auto flex flex-col gap-6">

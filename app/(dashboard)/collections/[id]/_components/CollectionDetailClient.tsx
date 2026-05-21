@@ -7,7 +7,7 @@ import {
   Lock, CheckCircle2, Database, FileText, Users, Image,
   ShoppingCart, Tag, Mail, Calendar, Globe, BarChart2,
   Bookmark, MessageSquare, Package, Star, Heart, Zap, Music,
-  Loader2, Hash, Table2,
+  Loader2, Hash, Table2, GitBranch,
 } from "lucide-react";
 import Link from "next/link";
 import FieldBuilder from "@/components/collections/FieldBuilder";
@@ -37,7 +37,7 @@ const TYPE_COLORS: Record<string, string> = {
   uuid:     "var(--text-muted)",
 };
 
-type CollectionWithFields = Collection & { fields: Field[] };
+type CollectionWithFields = Collection & { fields: Field[]; isGitBacked?: boolean };
 
 /* ── Field row ───────────────────────────────────────────── */
 function FieldRow({
@@ -53,6 +53,7 @@ function FieldRow({
   const [isPending, startTransition] = useTransition();
   const [confirming, setConfirming]  = useState(false);
   const color = TYPE_COLORS[field.type] ?? "var(--text-soft)";
+  const isGit = !!collection.isGitBacked;
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
@@ -113,26 +114,34 @@ function FieldRow({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button
-          onClick={() => onEdit(field)}
-          className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all"
-          style={{ background: "var(--bg-raised)", color: "var(--text-soft)" }}
-        >
-          <Edit2 size={11} /> Edit
-        </button>
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all"
-          style={{
-            background: confirming ? "var(--danger)" : "var(--bg-raised)",
-            color:      confirming ? "#fff"          : "var(--danger)",
-          }}
-        >
-          {isPending ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
-          {confirming ? "Sure?" : "Delete"}
-        </button>
+      <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 min-w-[80px] justify-end">
+        {isGit ? (
+          <span title="Managed in Git schema">
+            <Lock size={12} style={{ color: "var(--text-muted)" }} />
+          </span>
+        ) : (
+          <>
+            <button
+              onClick={() => onEdit(field)}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+              style={{ background: "var(--bg-raised)", color: "var(--text-soft)" }}
+            >
+              <Edit2 size={11} /> Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={isPending}
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer"
+              style={{
+                background: confirming ? "var(--danger)" : "var(--bg-raised)",
+                color:      confirming ? "#fff"          : "var(--danger)",
+              }}
+            >
+              {isPending ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />}
+              {confirming ? "Sure?" : "Delete"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -146,6 +155,7 @@ export default function CollectionDetailClient({
 }) {
   const [fieldBuilder, setFieldBuilder] = useState<Field | null | "new">(null);
   const CollIcon = ICON_MAP[collection.icon] ?? Database;
+  const isGit = !!collection.isGitBacked;
 
   return (
     <div className="p-6 max-w-4xl mx-auto flex flex-col gap-6">
@@ -166,13 +176,21 @@ export default function CollectionDetailClient({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-            style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
+            style={{ background: isGit ? "rgba(0,184,217,0.1)" : "var(--primary-dim)", color: isGit ? "#00B8D9" : "var(--primary)" }}>
             <CollIcon size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>
-              {collection.label}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>
+                {collection.label}
+              </h1>
+              {isGit && (
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase"
+                  style={{ background: "rgba(0,184,217,0.15)", color: "#00B8D9", border: "1px solid rgba(0,184,217,0.2)" }}>
+                  <GitBranch size={9} /> Git-Sync
+                </span>
+              )}
+            </div>
             <p className="text-xs font-mono mt-0.5" style={{ color: "var(--text-muted)" }}>
               {collection.name}
             </p>
@@ -188,13 +206,15 @@ export default function CollectionDetailClient({
           >
             <Table2 size={15} /> Browse Data
           </Link>
-          <button
-            onClick={() => setFieldBuilder("new")}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold"
-            style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
-          >
-            <Plus size={15} /> Add Field
-          </button>
+          {!isGit && (
+            <button
+              onClick={() => setFieldBuilder("new")}
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold cursor-pointer"
+              style={{ background: "var(--primary)", color: "var(--text-inverse)" }}
+            >
+              <Plus size={15} /> Add Field
+            </button>
+          )}
         </div>
       </div>
 
@@ -203,6 +223,20 @@ export default function CollectionDetailClient({
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>
           {collection.description}
         </p>
+      )}
+
+      {/* Git instructions Banner */}
+      {isGit && (
+        <div className="flex gap-3 rounded-xl p-4 text-xs leading-relaxed animate-fade-in"
+          style={{ background: "rgba(0,184,217,0.06)", border: "1px solid rgba(0,184,217,0.15)", color: "var(--text-soft)" }}>
+          <GitBranch size={16} className="shrink-0" style={{ color: "#00B8D9" }} />
+          <div className="flex flex-col gap-1">
+            <strong style={{ color: "var(--text)" }}>Schema Synchronization</strong>
+            <p>
+              This collection schema is managed via git. To add, edit, or delete fields, update the <code>.genesis/config.json</code> file in your connected repository branch.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Stats row */}
@@ -267,13 +301,15 @@ export default function CollectionDetailClient({
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
               No custom fields yet.
             </p>
-            <button
-              onClick={() => setFieldBuilder("new")}
-              className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg"
-              style={{ background: "var(--primary-dim)", color: "var(--primary)" }}
-            >
-              <Plus size={14} /> Add your first field
-            </button>
+            {!isGit && (
+              <button
+                onClick={() => setFieldBuilder("new")}
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg cursor-pointer"
+                style={{ background: "var(--primary-dim)", color: "var(--primary)" }}
+              >
+                <Plus size={14} /> Add your first field
+              </button>
+            )}
           </div>
         ) : (
           collection.fields.map((field) => (
@@ -298,3 +334,4 @@ export default function CollectionDetailClient({
     </div>
   );
 }
+

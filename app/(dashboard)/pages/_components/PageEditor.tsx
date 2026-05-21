@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Save, Globe, FileX, Plus, Trash2, GripVertical,
   Loader2, ChevronDown, ChevronUp, Type, AlignLeft, Image,
-  Minus, Columns2, ExternalLink, Check,
+  Minus, Columns2, ExternalLink, Check, Navigation, LayoutGrid,
+  MessageSquare, Footprints, Mail,
 } from "lucide-react";
 import { updatePageBlocks, updatePageStatus, updatePageMeta } from "@/lib/actions/pages";
 import type { Page } from "@prisma/client";
 
 /* ── Block types ─────────────────────────────────────────── */
-export type BlockType = "hero" | "text" | "image" | "divider" | "columns" | "button";
+export type BlockType = "hero" | "text" | "image" | "divider" | "columns" | "button" | "navbar" | "features" | "testimonial" | "footer" | "contact";
 
 export interface Block {
   id:   string;
@@ -20,12 +21,17 @@ export interface Block {
 }
 
 const BLOCK_DEFS: { type: BlockType; label: string; icon: React.ElementType; defaults: Record<string, string> }[] = [
-  { type: "hero",    label: "Hero",    icon: Type,     defaults: { heading: "Welcome", subheading: "Add a subtitle here", align: "center" } },
-  { type: "text",    label: "Text",    icon: AlignLeft, defaults: { content: "Add your text here..." } },
-  { type: "image",   label: "Image",   icon: Image,    defaults: { url: "", alt: "", caption: "" } },
-  { type: "button",  label: "Button",  icon: ExternalLink, defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
-  { type: "divider", label: "Divider", icon: Minus,    defaults: {} },
-  { type: "columns", label: "Columns", icon: Columns2, defaults: { left: "Left column content", right: "Right column content" } },
+  { type: "navbar",      label: "Navbar",      icon: Navigation,  defaults: { logo: "My Brand", links: "Home,About,Contact", cta: "Get Started", ctaUrl: "#", bg: "#ffffff" } },
+  { type: "hero",        label: "Hero",        icon: Type,        defaults: { heading: "Welcome to our site", subheading: "A short description of what you do.", ctaLabel: "Get Started", ctaUrl: "#", align: "center", bg: "#0f172a", color: "#ffffff" } },
+  { type: "features",    label: "Features",    icon: LayoutGrid,  defaults: { heading: "Why choose us", f1title: "Fast", f1desc: "Built for speed", f2title: "Reliable", f2desc: "Always available", f3title: "Secure", f3desc: "Your data is safe" } },
+  { type: "testimonial", label: "Testimonial", icon: MessageSquare, defaults: { quote: "This product changed how we work.", author: "Jane Doe", role: "CEO, Acme Inc", bg: "#f8fafc" } },
+  { type: "text",        label: "Text Block",  icon: AlignLeft,   defaults: { content: "Add your text here..." } },
+  { type: "image",       label: "Image",       icon: Image,       defaults: { url: "", alt: "", caption: "" } },
+  { type: "button",      label: "Button",      icon: ExternalLink, defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
+  { type: "contact",     label: "Contact",     icon: Mail,        defaults: { heading: "Get in touch", email: "hello@example.com", phone: "", address: "", bg: "#f8fafc" } },
+  { type: "columns",     label: "Columns",     icon: Columns2,    defaults: { left: "Left column content", right: "Right column content" } },
+  { type: "footer",      label: "Footer",      icon: Footprints,  defaults: { logo: "My Brand", links: "Home,About,Contact,Privacy", copy: `© ${new Date().getFullYear()} My Brand. All rights reserved.`, bg: "#0f172a", color: "#ffffff" } },
+  { type: "divider",     label: "Divider",     icon: Minus,       defaults: {} },
 ];
 
 function uid() {
@@ -69,11 +75,23 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
   const set = (key: string, val: string) => onChange({ ...d, [key]: val });
 
   switch (block.type) {
+    case "navbar":
+      return (
+        <>
+          <Field label="Brand / Logo Text"><Input value={d.logo ?? ""} onChange={(v) => set("logo", v)} placeholder="My Brand" /></Field>
+          <Field label="Nav Links (comma separated)"><Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Services,Contact" /></Field>
+          <Field label="CTA Button Label"><Input value={d.cta ?? ""} onChange={(v) => set("cta", v)} placeholder="Get Started" /></Field>
+          <Field label="CTA Button URL"><Input value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} placeholder="#" /></Field>
+          <Field label="Background Color"><Input value={d.bg ?? "#ffffff"} onChange={(v) => set("bg", v)} placeholder="#ffffff" /></Field>
+        </>
+      );
     case "hero":
       return (
         <>
           <Field label="Heading"><Input value={d.heading ?? ""} onChange={(v) => set("heading", v)} placeholder="Main heading" /></Field>
           <Field label="Subheading"><Textarea value={d.subheading ?? ""} onChange={(v) => set("subheading", v)} placeholder="Subtitle text" rows={2} /></Field>
+          <Field label="CTA Button Label"><Input value={d.ctaLabel ?? ""} onChange={(v) => set("ctaLabel", v)} placeholder="Get Started" /></Field>
+          <Field label="CTA Button URL"><Input value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} placeholder="#" /></Field>
           <Field label="Alignment">
             <select value={d.align ?? "center"} onChange={(e) => set("align", e.target.value)}
               className="rounded-lg px-3 py-2 text-sm outline-none"
@@ -85,6 +103,47 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           </Field>
           <Field label="Background Color"><Input value={d.bg ?? "#0f172a"} onChange={(v) => set("bg", v)} placeholder="#0f172a" /></Field>
           <Field label="Text Color"><Input value={d.color ?? "#ffffff"} onChange={(v) => set("color", v)} placeholder="#ffffff" /></Field>
+        </>
+      );
+    case "features":
+      return (
+        <>
+          <Field label="Section Heading"><Input value={d.heading ?? ""} onChange={(v) => set("heading", v)} placeholder="Why choose us" /></Field>
+          <Field label="Feature 1 Title"><Input value={d.f1title ?? ""} onChange={(v) => set("f1title", v)} /></Field>
+          <Field label="Feature 1 Description"><Input value={d.f1desc ?? ""} onChange={(v) => set("f1desc", v)} /></Field>
+          <Field label="Feature 2 Title"><Input value={d.f2title ?? ""} onChange={(v) => set("f2title", v)} /></Field>
+          <Field label="Feature 2 Description"><Input value={d.f2desc ?? ""} onChange={(v) => set("f2desc", v)} /></Field>
+          <Field label="Feature 3 Title"><Input value={d.f3title ?? ""} onChange={(v) => set("f3title", v)} /></Field>
+          <Field label="Feature 3 Description"><Input value={d.f3desc ?? ""} onChange={(v) => set("f3desc", v)} /></Field>
+        </>
+      );
+    case "testimonial":
+      return (
+        <>
+          <Field label="Quote"><Textarea value={d.quote ?? ""} onChange={(v) => set("quote", v)} rows={3} placeholder="What did they say?" /></Field>
+          <Field label="Author Name"><Input value={d.author ?? ""} onChange={(v) => set("author", v)} placeholder="Jane Doe" /></Field>
+          <Field label="Author Role"><Input value={d.role ?? ""} onChange={(v) => set("role", v)} placeholder="CEO, Acme Inc" /></Field>
+          <Field label="Background Color"><Input value={d.bg ?? "#f8fafc"} onChange={(v) => set("bg", v)} /></Field>
+        </>
+      );
+    case "contact":
+      return (
+        <>
+          <Field label="Section Heading"><Input value={d.heading ?? ""} onChange={(v) => set("heading", v)} placeholder="Get in touch" /></Field>
+          <Field label="Email"><Input value={d.email ?? ""} onChange={(v) => set("email", v)} placeholder="hello@example.com" /></Field>
+          <Field label="Phone"><Input value={d.phone ?? ""} onChange={(v) => set("phone", v)} placeholder="+1 234 567 8900" /></Field>
+          <Field label="Address"><Textarea value={d.address ?? ""} onChange={(v) => set("address", v)} rows={2} placeholder="123 Main St, City" /></Field>
+          <Field label="Background Color"><Input value={d.bg ?? "#f8fafc"} onChange={(v) => set("bg", v)} /></Field>
+        </>
+      );
+    case "footer":
+      return (
+        <>
+          <Field label="Brand / Logo Text"><Input value={d.logo ?? ""} onChange={(v) => set("logo", v)} placeholder="My Brand" /></Field>
+          <Field label="Footer Links (comma separated)"><Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Privacy,Terms" /></Field>
+          <Field label="Copyright Text"><Input value={d.copy ?? ""} onChange={(v) => set("copy", v)} placeholder={`© ${new Date().getFullYear()} My Brand`} /></Field>
+          <Field label="Background Color"><Input value={d.bg ?? "#0f172a"} onChange={(v) => set("bg", v)} /></Field>
+          <Field label="Text Color"><Input value={d.color ?? "#ffffff"} onChange={(v) => set("color", v)} /></Field>
         </>
       );
     case "text":

@@ -5,19 +5,21 @@ import { usePathname } from "next/navigation";
 import {
   LayoutGrid, Database, FolderOpen, Users, Settings,
   Zap, BarChart2, ChevronLeft, ChevronRight, Globe,
-  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate,
+  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate, PackageOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
 
 /* ── Nav data ──────────────────────────────────────────────── */
 const NAV_MAIN = [
-  { label: "Overview",    href: "/",           icon: LayoutGrid   },
-  { label: "Collections", href: "/collections", icon: Database     },
-  { label: "Pages",       href: "/pages",       icon: LayoutTemplate },
-  { label: "Files",       href: "/files",       icon: FolderOpen   },
-  { label: "Flows",       href: "/flows",       icon: Zap          },
-  { label: "Insights",    href: "/insights",    icon: BarChart2    },
+  { label: "Overview",       href: "/",            icon: LayoutGrid    },
+  { label: "Collections",    href: "/collections", icon: Database      },
+  { label: "Pages",          href: "/pages",       icon: LayoutTemplate },
+  { label: "Files",          href: "/files",       icon: FolderOpen    },
+  { label: "Live Preview",   href: "/preview",     icon: Globe         },
+  { label: "Migration Kit",  href: "/migrate",     icon: PackageOpen   },
+  { label: "Flows",          href: "/flows",       icon: Zap           },
+  { label: "Insights",       href: "/insights",    icon: BarChart2     },
 ];
 
 const NAV_SYSTEM = [
@@ -34,7 +36,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-3 px-4 py-5 select-none">
       <div
-        className="relative flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+        className="relative shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
         style={{
           background: "linear-gradient(135deg, #00C8F8 0%, #7B61FF 100%)",
           boxShadow: "0 0 16px rgba(0,200,248,0.4)",
@@ -80,7 +82,7 @@ function NavItem({
         if (!active) (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
       }}
     >
-      <Icon size={17} className="flex-shrink-0" />
+      <Icon size={17} className="shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
       {collapsed && active && (
         <span className="absolute right-1 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full"
@@ -176,7 +178,7 @@ export default function Sidebar() {
     <>
       {/* ── Desktop sidebar ──────────────────────────────────── */}
       <aside
-        className="relative hidden lg:flex flex-col flex-shrink-0 transition-all duration-200"
+        className="relative hidden lg:flex flex-col shrink-0 transition-all duration-200"
         style={{ width: sidebarCollapsed ? "64px" : "220px" }}
       >
         <SidebarContent collapsed={sidebarCollapsed} />
@@ -184,7 +186,7 @@ export default function Sidebar() {
         {/* Collapse toggle */}
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-[72px] z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
+          className="absolute -right-3 top-18 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
           style={{
             background:  "var(--bg-raised)",
             border:      "1px solid var(--border-light)",
@@ -208,7 +210,7 @@ export default function Sidebar() {
           />
           {/* Drawer */}
           <div
-            className="fixed left-0 top-0 bottom-0 z-50 w-[220px] animate-slide-in lg:hidden"
+            className="fixed left-0 top-0 bottom-0 z-50 w-55 animate-slide-in lg:hidden"
           >
             <SidebarContent collapsed={false} onClose={closeMobileSidebar} />
           </div>

@@ -3,9 +3,10 @@
 import { useState, useTransition, useEffect } from "react";
 import { X, Loader2, AlertCircle } from "lucide-react";
 import { createRecord, updateRecord, getRecordLabels } from "@/lib/actions/collections";
+import { createGitRecord, updateGitRecord } from "@/lib/actions/git";
 import type { Collection, Field, Record as PrismaRecord } from "@prisma/client";
 
-type CollectionWithFields = Collection & { fields: Field[] };
+type CollectionWithFields = Collection & { fields: Field[]; isGitBacked?: boolean };
 
 interface SelectOption { label: string; value: string }
 interface RelationMeta { targetCollectionId: string; targetCollectionName: string; relationType: "one" | "many" }
@@ -327,12 +328,22 @@ export default function RecordFormModal({
       }
     }
 
+    const isGit = !!collection.isGitBacked;
+
     startTransition(async () => {
       try {
         if (editing) {
-          await updateRecord(record!.id, collection.id, values);
+          if (isGit) {
+            await updateGitRecord(record!.id, collection.id, values);
+          } else {
+            await updateRecord(record!.id, collection.id, values);
+          }
         } else {
-          await createRecord(collection.id, values);
+          if (isGit) {
+            await createGitRecord(collection.id, values);
+          } else {
+            await createRecord(collection.id, values);
+          }
         }
         onClose();
       } catch (err: unknown) {
@@ -340,6 +351,7 @@ export default function RecordFormModal({
       }
     });
   }
+
 
   return (
     <div

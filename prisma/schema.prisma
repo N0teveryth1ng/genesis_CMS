@@ -137,3 +137,28 @@ model Page {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+model GitIntegration {
+  id             String    @id @default("singleton")
+  enabled        Boolean   @default(false)
+  owner          String    @default("")
+  repo           String    @default("")
+  branch         String    @default("main")
+  configPath     String    @default(".genesis/config.json")
+  accessToken    String    @default("")
+  webhookUrl     String    @default("")
+  webhookEnabled Boolean   @default(false)
+  webhookStatus  String    @default("idle")
+  lastTriggered  DateTime?
+  
+  // Sandbox Hosting State
+  sandboxStatus  String    @default("idle")  // "idle" | "cloning" | "building" | "running" | "failed"
+  sandboxPort    Int       @default(4000)
+  sandboxUrl     String    @default("")
+  sandboxLogs    String    @default("")
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+

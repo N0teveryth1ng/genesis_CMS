@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getSettings } from "@/lib/actions/settings";
+import { getSettings, getGitIntegration } from "@/lib/actions/settings";
 import { db } from "@/lib/db";
 import SettingsClient from "./_components/SettingsClient";
 
@@ -9,9 +9,10 @@ export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const [session, settings] = await Promise.all([
+  const [session, settings, gitIntegration] = await Promise.all([
     getServerSession(authOptions),
     getSettings(),
+    getGitIntegration(),
   ]);
 
   const sessionUser = session?.user as { id?: string; role?: string; name?: string; email?: string };
@@ -25,6 +26,9 @@ export default async function SettingsPage() {
     <SettingsClient
       settings={settings}
       user={user ?? { id: "", name: "", email: "", role: "viewer" }}
+      gitIntegration={gitIntegration}
+      hasOAuthConfigured={Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET)}
     />
   );
 }
+
