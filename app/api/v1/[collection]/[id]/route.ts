@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { db } from "@/lib/db";
 import { fireWebhooks } from "@/lib/actions/webhooks";
+import {
+  getDynamicRow,
+  updateDynamicRow,
+  deleteDynamicRow,
+} from "@/lib/db-dynamic";
 
 export const runtime = "nodejs";
 
@@ -27,8 +32,17 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const col = await db.collection.findUnique({ where: { name: collectionName } });
   if (!col) return NextResponse.json({ error: "Collection not found" }, { status: 404 });
 
+  if (col.tableName) {
+    const record = await getDynamicRow(col.tableName, col.id, id);
+    if (!record) return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    let parsed: Record<string, unknown> = {};
+    try { parsed = JSON.parse(record.data); } catch { /* empty */ }
+    return NextResponse.json({ data: { id: record.id, ...parsed, createdAt: record.createdAt, updatedAt: record.updatedAt } });
+  }
+
+  // Legacy path
   const record = await db.record.findFirst({ where: { id, collectionId: col.id } });
-  if (!record)  return NextResponse.json({ error: "Record not found" }, { status: 404 });
+  if (!record) return NextResponse.json({ error: "Record not found" }, { status: 404 });
 
   let parsed: Record<string, unknown> = {};
   try { parsed = JSON.parse(record.data); } catch { /* empty */ }
@@ -46,13 +60,27 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const col = await db.collection.findUnique({ where: { name: collectionName } });
   if (!col) return NextResponse.json({ error: "Collection not found" }, { status: 404 });
 
-  const record = await db.record.findFirst({ where: { id, collectionId: col.id } });
-  if (!record)  return NextResponse.json({ error: "Record not found" }, { status: 404 });
-
   let body: Record<string, unknown> = {};
   try { body = await req.json(); } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  if (col.tableName) {
+    const existing = await getDynamicRow(col.tableName, col.id, id);
+    if (!existing) return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    let existingData: Record<string, unknown> = {};
+    try { existingData = JSON.parse(existing.data); } catch { /* empty */ }
+    const merged = { ...existingData, ...body };
+    const updated = await updateDynamicRow(col.tableName, col.id, id, merged);
+    let parsed: Record<string, unknown> = {};
+    try { parsed = JSON.parse(updated.data); } catch { /* empty */ }
+    fireWebhooks("record.update", col.id, col.name, { id: updated.id, ...parsed }).catch(() => {});
+    return NextResponse.json({ data: { id: updated.id, ...parsed, createdAt: updated.createdAt, updatedAt: updated.updatedAt } });
+  }
+
+  // Legacy path
+  const record = await db.record.findFirst({ where: { id, collectionId: col.id } });
+  if (!record) return NextResponse.json({ error: "Record not found" }, { status: 404 });
 
   let existing: Record<string, unknown> = {};
   try { existing = JSON.parse(record.data); } catch { /* empty */ }
@@ -77,8 +105,17 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
   const col = await db.collection.findUnique({ where: { name: collectionName } });
   if (!col) return NextResponse.json({ error: "Collection not found" }, { status: 404 });
 
+  if (col.tableName) {
+    const record = await getDynamicRow(col.tableName, col.id, id);
+    if (!record) return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    await deleteDynamicRow(col.tableName, id);
+    fireWebhooks("record.delete", col.id, col.name, { id }).catch(() => {});
+    return NextResponse.json({ data: { id } });
+  }
+
+  // Legacy path
   const record = await db.record.findFirst({ where: { id, collectionId: col.id } });
-  if (!record)  return NextResponse.json({ error: "Record not found" }, { status: 404 });
+  if (!record) return NextResponse.json({ error: "Record not found" }, { status: 404 });
 
   await db.record.delete({ where: { id } });
   fireWebhooks("record.delete", col.id, col.name, { id }).catch(() => {});

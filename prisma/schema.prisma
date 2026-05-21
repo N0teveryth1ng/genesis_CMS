@@ -25,6 +25,7 @@ model Collection {
   label       String            // display: "Blog Posts"
   icon        String   @default("Database")
   description String?
+  tableName   String?           // dynamic Postgres table: "genesis_col_{name}"
   fields      Field[]
   records     Record[]
   permissions Permission[]
