@@ -1,44 +1,57 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Save, Globe, FileX, Plus, Trash2, GripVertical,
   Loader2, ChevronDown, ChevronUp, Type, AlignLeft, Image,
   Minus, Columns2, ExternalLink, Check, Navigation, LayoutGrid,
-  MessageSquare, Footprints, Mail,
+  MessageSquare, Footprints, Mail, Sliders,
 } from "lucide-react";
-import { updatePageBlocks, updatePageStatus, updatePageMeta } from "@/lib/actions/pages";
+import { updatePageBlocks, updatePageStatus } from "@/lib/actions/pages";
 import type { Page } from "@prisma/client";
 
 /* ── Block types ─────────────────────────────────────────── */
-export type BlockType = "hero" | "text" | "image" | "divider" | "columns" | "button" | "navbar" | "features" | "testimonial" | "footer" | "contact";
+export type BlockType =
+  | "hero" | "text" | "image" | "divider" | "columns" | "button"
+  | "navbar" | "features" | "testimonial" | "footer" | "contact";
+
+export interface BlockStyle {
+  bg?:           string;
+  color?:        string;
+  paddingY?:     "none" | "sm" | "md" | "lg" | "xl";
+  textAlign?:    "left" | "center" | "right";
+  fontSize?:     "sm" | "base" | "lg" | "xl";
+  fontWeight?:   "normal" | "medium" | "bold";
+  borderRadius?: "none" | "sm" | "md" | "lg";
+}
 
 export interface Block {
-  id:   string;
-  type: BlockType;
-  data: Record<string, string>;
+  id:     string;
+  type:   BlockType;
+  data:   Record<string, string>;
+  style?: BlockStyle;
 }
 
 const BLOCK_DEFS: { type: BlockType; label: string; icon: React.ElementType; defaults: Record<string, string> }[] = [
-  { type: "navbar",      label: "Navbar",      icon: Navigation,  defaults: { logo: "My Brand", links: "Home,About,Contact", cta: "Get Started", ctaUrl: "#", bg: "#ffffff" } },
-  { type: "hero",        label: "Hero",        icon: Type,        defaults: { heading: "Welcome to our site", subheading: "A short description of what you do.", ctaLabel: "Get Started", ctaUrl: "#", align: "center", bg: "#0f172a", color: "#ffffff" } },
-  { type: "features",    label: "Features",    icon: LayoutGrid,  defaults: { heading: "Why choose us", f1title: "Fast", f1desc: "Built for speed", f2title: "Reliable", f2desc: "Always available", f3title: "Secure", f3desc: "Your data is safe" } },
-  { type: "testimonial", label: "Testimonial", icon: MessageSquare, defaults: { quote: "This product changed how we work.", author: "Jane Doe", role: "CEO, Acme Inc", bg: "#f8fafc" } },
-  { type: "text",        label: "Text Block",  icon: AlignLeft,   defaults: { content: "Add your text here..." } },
-  { type: "image",       label: "Image",       icon: Image,       defaults: { url: "", alt: "", caption: "" } },
-  { type: "button",      label: "Button",      icon: ExternalLink, defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
-  { type: "contact",     label: "Contact",     icon: Mail,        defaults: { heading: "Get in touch", email: "hello@example.com", phone: "", address: "", bg: "#f8fafc" } },
-  { type: "columns",     label: "Columns",     icon: Columns2,    defaults: { left: "Left column content", right: "Right column content" } },
-  { type: "footer",      label: "Footer",      icon: Footprints,  defaults: { logo: "My Brand", links: "Home,About,Contact,Privacy", copy: `© ${new Date().getFullYear()} My Brand. All rights reserved.`, bg: "#0f172a", color: "#ffffff" } },
-  { type: "divider",     label: "Divider",     icon: Minus,       defaults: {} },
+  { type: "navbar",      label: "Navbar",      icon: Navigation,    defaults: { logo: "My Brand", links: "Home,About,Contact", cta: "Get Started", ctaUrl: "#" } },
+  { type: "hero",        label: "Hero",        icon: Type,          defaults: { heading: "Welcome to our site", subheading: "A short description of what you do.", ctaLabel: "Get Started", ctaUrl: "#", align: "center" } },
+  { type: "features",    label: "Features",    icon: LayoutGrid,    defaults: { heading: "Why choose us", f1title: "Fast", f1desc: "Built for speed", f2title: "Reliable", f2desc: "Always available", f3title: "Secure", f3desc: "Your data is safe" } },
+  { type: "testimonial", label: "Testimonial", icon: MessageSquare, defaults: { quote: "This product changed how we work.", author: "Jane Doe", role: "CEO, Acme Inc" } },
+  { type: "text",        label: "Text Block",  icon: AlignLeft,     defaults: { content: "Add your text here..." } },
+  { type: "image",       label: "Image",       icon: Image,         defaults: { url: "", alt: "", caption: "" } },
+  { type: "button",      label: "Button",      icon: ExternalLink,  defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
+  { type: "contact",     label: "Contact",     icon: Mail,          defaults: { heading: "Get in touch", email: "hello@example.com", phone: "", address: "" } },
+  { type: "columns",     label: "Columns",     icon: Columns2,      defaults: { left: "Left column content", right: "Right column content" } },
+  { type: "footer",      label: "Footer",      icon: Footprints,    defaults: { logo: "My Brand", links: "Home,About,Contact,Privacy", copy: `© ${new Date().getFullYear()} My Brand. All rights reserved.` } },
+  { type: "divider",     label: "Divider",     icon: Minus,         defaults: {} },
 ];
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-/* ── Block editor panels ─────────────────────────────────── */
+/* ── Shared field components ─────────────────────────────── */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -70,6 +83,107 @@ function Textarea({ value, onChange, placeholder, rows = 4 }: { value: string; o
   );
 }
 
+/* ── Style panel ─────────────────────────────────────────── */
+function ChipGroup({ options, value, onChange }: {
+  options: { val: string; label: string }[];
+  value?: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex gap-1 flex-wrap">
+      {options.map((o) => (
+        <button key={o.val} onClick={() => onChange(o.val)}
+          className="px-2.5 py-1 rounded-md text-xs font-medium transition-all"
+          style={{
+            background: value === o.val ? "var(--primary)" : "var(--bg-surface)",
+            color:      value === o.val ? "var(--text-inverse)" : "var(--text-soft)",
+            border:     "1px solid var(--border)",
+          }}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ColorInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>{label}</label>
+      <div className="flex items-center gap-2">
+        <input type="color" value={value || "#ffffff"} onChange={(e) => onChange(e.target.value)}
+          className="shrink-0 cursor-pointer rounded-md"
+          style={{ width: 32, height: 32, padding: 2, border: "1px solid var(--border)", background: "var(--bg-surface)" }} />
+        <Input value={value} onChange={onChange} placeholder="transparent" />
+      </div>
+    </div>
+  );
+}
+
+const PADDING_OPTS = [
+  { val: "none", label: "None" }, { val: "sm", label: "S" },
+  { val: "md",   label: "M"    }, { val: "lg", label: "L" }, { val: "xl", label: "XL" },
+];
+const RADIUS_OPTS = [
+  { val: "none", label: "None" }, { val: "sm", label: "S" },
+  { val: "md",   label: "M"    }, { val: "lg", label: "L" },
+];
+const ALIGN_OPTS = [
+  { val: "left", label: "Left" }, { val: "center", label: "Center" }, { val: "right", label: "Right" },
+];
+const SIZE_OPTS = [
+  { val: "sm", label: "S" }, { val: "base", label: "M" }, { val: "lg", label: "L" }, { val: "xl", label: "XL" },
+];
+const WEIGHT_OPTS = [
+  { val: "normal", label: "Normal" }, { val: "medium", label: "Medium" }, { val: "bold", label: "Bold" },
+];
+
+function StylePanel({ style, onChange }: { style: BlockStyle; onChange: (s: BlockStyle) => void }) {
+  const set = (key: keyof BlockStyle, val: string) => onChange({ ...style, [key]: val });
+  const hasAny = Object.values(style).some((v) => v !== undefined && v !== "");
+
+  return (
+    <div className="flex flex-col gap-4">
+      <ColorInput label="Background" value={style.bg    ?? ""} onChange={(v) => set("bg",    v)} />
+      <ColorInput label="Text Color" value={style.color ?? ""} onChange={(v) => set("color", v)} />
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>Padding</label>
+        <ChipGroup options={PADDING_OPTS} value={style.paddingY}     onChange={(v) => set("paddingY",     v)} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>Rounding</label>
+        <ChipGroup options={RADIUS_OPTS}  value={style.borderRadius} onChange={(v) => set("borderRadius", v)} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>Text Align</label>
+        <ChipGroup options={ALIGN_OPTS}   value={style.textAlign}    onChange={(v) => set("textAlign",    v)} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>Font Size</label>
+        <ChipGroup options={SIZE_OPTS}    value={style.fontSize}     onChange={(v) => set("fontSize",     v)} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>Font Weight</label>
+        <ChipGroup options={WEIGHT_OPTS}  value={style.fontWeight}   onChange={(v) => set("fontWeight",   v)} />
+      </div>
+
+      {hasAny && (
+        <button onClick={() => onChange({})}
+          className="text-xs px-3 py-1.5 rounded-lg w-full"
+          style={{ background: "var(--bg-raised)", color: "var(--danger)", border: "1px solid var(--border)" }}>
+          Reset styles
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ── Block content fields ────────────────────────────────── */
 function BlockFields({ block, onChange }: { block: Block; onChange: (data: Record<string, string>) => void }) {
   const d = block.data;
   const set = (key: string, val: string) => onChange({ ...d, [key]: val });
@@ -82,7 +196,6 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           <Field label="Nav Links (comma separated)"><Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Services,Contact" /></Field>
           <Field label="CTA Button Label"><Input value={d.cta ?? ""} onChange={(v) => set("cta", v)} placeholder="Get Started" /></Field>
           <Field label="CTA Button URL"><Input value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} placeholder="#" /></Field>
-          <Field label="Background Color"><Input value={d.bg ?? "#ffffff"} onChange={(v) => set("bg", v)} placeholder="#ffffff" /></Field>
         </>
       );
     case "hero":
@@ -101,8 +214,6 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
               <option value="right">Right</option>
             </select>
           </Field>
-          <Field label="Background Color"><Input value={d.bg ?? "#0f172a"} onChange={(v) => set("bg", v)} placeholder="#0f172a" /></Field>
-          <Field label="Text Color"><Input value={d.color ?? "#ffffff"} onChange={(v) => set("color", v)} placeholder="#ffffff" /></Field>
         </>
       );
     case "features":
@@ -123,7 +234,6 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           <Field label="Quote"><Textarea value={d.quote ?? ""} onChange={(v) => set("quote", v)} rows={3} placeholder="What did they say?" /></Field>
           <Field label="Author Name"><Input value={d.author ?? ""} onChange={(v) => set("author", v)} placeholder="Jane Doe" /></Field>
           <Field label="Author Role"><Input value={d.role ?? ""} onChange={(v) => set("role", v)} placeholder="CEO, Acme Inc" /></Field>
-          <Field label="Background Color"><Input value={d.bg ?? "#f8fafc"} onChange={(v) => set("bg", v)} /></Field>
         </>
       );
     case "contact":
@@ -133,7 +243,6 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           <Field label="Email"><Input value={d.email ?? ""} onChange={(v) => set("email", v)} placeholder="hello@example.com" /></Field>
           <Field label="Phone"><Input value={d.phone ?? ""} onChange={(v) => set("phone", v)} placeholder="+1 234 567 8900" /></Field>
           <Field label="Address"><Textarea value={d.address ?? ""} onChange={(v) => set("address", v)} rows={2} placeholder="123 Main St, City" /></Field>
-          <Field label="Background Color"><Input value={d.bg ?? "#f8fafc"} onChange={(v) => set("bg", v)} /></Field>
         </>
       );
     case "footer":
@@ -142,8 +251,6 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           <Field label="Brand / Logo Text"><Input value={d.logo ?? ""} onChange={(v) => set("logo", v)} placeholder="My Brand" /></Field>
           <Field label="Footer Links (comma separated)"><Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Privacy,Terms" /></Field>
           <Field label="Copyright Text"><Input value={d.copy ?? ""} onChange={(v) => set("copy", v)} placeholder={`© ${new Date().getFullYear()} My Brand`} /></Field>
-          <Field label="Background Color"><Input value={d.bg ?? "#0f172a"} onChange={(v) => set("bg", v)} /></Field>
-          <Field label="Text Color"><Input value={d.color ?? "#ffffff"} onChange={(v) => set("color", v)} /></Field>
         </>
       );
     case "text":
@@ -191,55 +298,107 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
         </>
       );
     case "divider":
-      return <p className="text-xs" style={{ color: "var(--text-muted)" }}>Horizontal divider — no options.</p>;
+      return <p className="text-xs" style={{ color: "var(--text-muted)" }}>Horizontal divider — use the Style tab to add spacing.</p>;
   }
 }
 
 /* ── Single block card ───────────────────────────────────── */
 function BlockCard({
-  block, index, total,
-  onMove, onDelete, onChange,
+  block, isDragging, isDragOver,
+  onDragStart, onDragOver, onDragEnd, onDrop,
+  onDelete, onChange, onStyleChange,
 }: {
-  block: Block; index: number; total: number;
-  onMove: (dir: -1 | 1) => void;
-  onDelete: () => void;
-  onChange: (data: Record<string, string>) => void;
+  block:         Block;
+  isDragging:    boolean;
+  isDragOver:    boolean;
+  onDragStart:   () => void;
+  onDragOver:    (e: React.DragEvent) => void;
+  onDragEnd:     () => void;
+  onDrop:        () => void;
+  onDelete:      () => void;
+  onChange:      (data: Record<string, string>) => void;
+  onStyleChange: (style: BlockStyle) => void;
 }) {
   const [open, setOpen] = useState(true);
-  const def = BLOCK_DEFS.find((d) => d.type === block.type)!;
+  const [tab,  setTab]  = useState<"content" | "style">("content");
+  const def  = BLOCK_DEFS.find((d) => d.type === block.type)!;
   const Icon = def.icon;
+  const hasStyle = block.style && Object.values(block.style).some((v) => v !== undefined && v !== "");
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--border)", background: "var(--bg-surface)" }}>
-      <div className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none"
+    <div
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
+      onDrop={(e) => { e.preventDefault(); onDrop(); }}
+      className="rounded-xl overflow-hidden transition-all"
+      style={{
+        border:     `1px solid ${isDragOver ? "var(--primary)" : "var(--border)"}`,
+        background: "var(--bg-surface)",
+        opacity:    isDragging ? 0.4 : 1,
+        boxShadow:  isDragOver ? "0 0 0 2px var(--primary-dim)" : "none",
+        transform:  isDragOver ? "scale(1.01)" : "scale(1)",
+      }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-center gap-3 px-4 py-3 select-none"
         style={{ background: "var(--bg-raised)", borderBottom: open ? "1px solid var(--border)" : "none" }}
-        onClick={() => setOpen((o) => !o)}>
-        <GripVertical size={14} style={{ color: "var(--text-muted)" }} />
-        <div className="w-6 h-6 rounded-md flex items-center justify-center"
-          style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
-          <Icon size={12} />
+      >
+        <div className="cursor-grab active:cursor-grabbing p-0.5 rounded"
+          style={{ color: "var(--text-muted)", touchAction: "none" }}
+          title="Drag to reorder">
+          <GripVertical size={14} />
         </div>
-        <span className="text-sm font-medium flex-1" style={{ color: "var(--text)" }}>{def.label}</span>
 
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <button disabled={index === 0} onClick={() => onMove(-1)}
-            className="p-1 rounded disabled:opacity-30" style={{ color: "var(--text-muted)" }}>
-            <ChevronUp size={13} />
-          </button>
-          <button disabled={index === total - 1} onClick={() => onMove(1)}
-            className="p-1 rounded disabled:opacity-30" style={{ color: "var(--text-muted)" }}>
-            <ChevronDown size={13} />
-          </button>
-          <button onClick={onDelete} className="p-1 rounded" style={{ color: "var(--danger)" }}>
-            <Trash2 size={13} />
-          </button>
+        <div className="flex items-center gap-3 flex-1 cursor-pointer"
+          onClick={() => setOpen((o) => !o)}>
+          <div className="w-6 h-6 rounded-md flex items-center justify-center relative"
+            style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
+            <Icon size={12} />
+            {hasStyle && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+                style={{ background: "var(--primary)" }} />
+            )}
+          </div>
+          <span className="text-sm font-medium flex-1" style={{ color: "var(--text)" }}>{def.label}</span>
+          {open
+            ? <ChevronUp   size={13} style={{ color: "var(--text-muted)" }} />
+            : <ChevronDown size={13} style={{ color: "var(--text-muted)" }} />}
         </div>
+
+        <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="p-1 rounded ml-1" style={{ color: "var(--danger)" }}>
+          <Trash2 size={13} />
+        </button>
       </div>
 
+      {/* Tabs + content */}
       {open && (
-        <div className="flex flex-col gap-4 p-4">
-          <BlockFields block={block} onChange={onChange} />
-        </div>
+        <>
+          <div className="flex" style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-raised)" }}>
+            {(["content", "style"] as const).map((t) => (
+              <button key={t} onClick={() => setTab(t)}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium capitalize"
+                style={{
+                  color:        tab === t ? "var(--primary)" : "var(--text-soft)",
+                  borderBottom: tab === t ? "2px solid var(--primary)" : "2px solid transparent",
+                  marginBottom: -1,
+                  background:   "transparent",
+                }}>
+                {t === "style" && <Sliders size={10} />}
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-4 p-4">
+            {tab === "content"
+              ? <BlockFields block={block} onChange={onChange} />
+              : <StylePanel  style={block.style ?? {}} onChange={onStyleChange} />}
+          </div>
+        </>
       )}
     </div>
   );
@@ -290,9 +449,12 @@ export default function PageEditor({ page }: { page: Page }) {
   const [blocks, setBlocks] = useState<Block[]>(() => {
     try { return JSON.parse(page.blocks) as Block[]; } catch { return []; }
   });
-  const [status, setStatus]   = useState(page.status as "draft" | "published");
-  const [saved, setSaved]     = useState(false);
+  const [status, setStatus]         = useState(page.status as "draft" | "published");
+  const [saved,  setSaved]          = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const dragIndex  = useRef<number>(-1);
+  const [dragOver, setDragOver] = useState<number>(-1);
 
   function addBlock(type: BlockType) {
     const def = BLOCK_DEFS.find((d) => d.type === type)!;
@@ -303,19 +465,25 @@ export default function PageEditor({ page }: { page: Page }) {
     setBlocks((prev) => prev.map((b) => b.id === id ? { ...b, data } : b));
   }
 
+  function updateBlockStyle(id: string, style: BlockStyle) {
+    setBlocks((prev) => prev.map((b) => b.id === id ? { ...b, style } : b));
+  }
+
   function deleteBlock(id: string) {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   }
 
-  function moveBlock(id: string, dir: -1 | 1) {
+  function handleDrop(dropIdx: number) {
+    const from = dragIndex.current;
+    if (from === -1 || from === dropIdx) return;
     setBlocks((prev) => {
-      const i = prev.findIndex((b) => b.id === id);
       const next = [...prev];
-      const target = i + dir;
-      if (target < 0 || target >= next.length) return prev;
-      [next[i], next[target]] = [next[target], next[i]];
+      const [moved] = next.splice(from, 1);
+      next.splice(dropIdx, 0, moved);
       return next;
     });
+    dragIndex.current = -1;
+    setDragOver(-1);
   }
 
   function save(newStatus?: "draft" | "published") {
@@ -389,11 +557,15 @@ export default function PageEditor({ page }: { page: Page }) {
             <BlockCard
               key={block.id}
               block={block}
-              index={i}
-              total={blocks.length}
-              onMove={(dir) => moveBlock(block.id, dir)}
+              isDragging={dragIndex.current === i}
+              isDragOver={dragOver === i}
+              onDragStart={() => { dragIndex.current = i; }}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+              onDragEnd={() => { dragIndex.current = -1; setDragOver(-1); }}
+              onDrop={() => handleDrop(i)}
               onDelete={() => deleteBlock(block.id)}
               onChange={(data) => updateBlock(block.id, data)}
+              onStyleChange={(style) => updateBlockStyle(block.id, style)}
             />
           ))}
 

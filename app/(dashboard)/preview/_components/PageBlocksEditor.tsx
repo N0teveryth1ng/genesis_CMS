@@ -7,7 +7,7 @@ import {
   Navigation, Type, LayoutGrid, MessageSquare, AlignLeft,
   Image as ImageIcon, ExternalLink, Mail, Footprints, Minus, Columns2,
   ChevronDown, ChevronRight, Save, Check, Loader2, RefreshCw,
-  Globe, LayoutTemplate,
+  Globe, LayoutTemplate, GripVertical,
 } from "lucide-react";
 
 interface Block { id: string; type: string; data: Record<string, string> }
@@ -112,8 +112,10 @@ export default function PageBlocksEditor({
   const [blocks, setBlocks]   = useState<Block[]>([]);
   const [open, setOpen]       = useState<string>("");
   const [status, setStatus]   = useState<"idle" | "saving" | "saved">("idle");
+  const [dragOver, setDragOver] = useState<number>(-1);
   const saveTimer             = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const statusTimer           = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dragIndex             = useRef<number>(-1);
 
   // Re-initialise whenever the selected page changes
   useEffect(() => {
@@ -136,6 +138,19 @@ export default function PageBlocksEditor({
     clearTimeout(statusTimer.current);
     statusTimer.current = setTimeout(() => setStatus("idle"), 2500);
   }, [activePage, onSaved]);
+
+  function handleDrop(dropIdx: number) {
+    const from = dragIndex.current;
+    if (from === -1 || from === dropIdx) return;
+    const next = [...blocks];
+    const [moved] = next.splice(from, 1);
+    next.splice(dropIdx, 0, moved);
+    setBlocks(next);
+    dragIndex.current = -1;
+    setDragOver(-1);
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => persist(next), 800);
+  }
 
   function handleChange(blockId: string, key: string, value: string) {
     const next = blocks.map((b) =>
@@ -215,11 +230,25 @@ export default function PageBlocksEditor({
             const isOpen = open === block.id;
 
             return (
-              <div key={block.id} style={{ borderBottom: "1px solid var(--border)" }}>
+              <div
+                key={block.id}
+                draggable
+                onDragStart={() => { dragIndex.current = idx; }}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(idx); }}
+                onDragEnd={() => { dragIndex.current = -1; setDragOver(-1); }}
+                onDrop={(e) => { e.preventDefault(); handleDrop(idx); }}
+                style={{
+                  borderBottom: "1px solid var(--border)",
+                  opacity:      dragIndex.current === idx ? 0.4 : 1,
+                  outline:      dragOver === idx ? "2px solid var(--primary)" : "none",
+                  outlineOffset: "-2px",
+                }}
+              >
                 <button
                   onClick={() => setOpen(isOpen ? "" : block.id)}
                   className="flex items-center gap-3 w-full px-4 py-2.5 text-left"
                   style={{ background: isOpen ? "var(--primary-dim)" : "transparent" }}>
+                  <GripVertical size={11} style={{ color: "var(--text-muted)", cursor: "grab", flexShrink: 0 }} />
                   <div className="w-5 h-5 rounded flex items-center justify-center shrink-0"
                     style={{ background: meta.color + "20" }}>
                     <Icon size={11} style={{ color: meta.color }} />
