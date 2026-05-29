@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { fireWebhooks } from "./webhooks";
 import { logAudit } from "./audit";
+import { triggerFlows } from "./flows";
+import { applyExtensions } from "@/lib/extensions/runner";
 import {
   tableNameForCollection,
   createDynamicTable,
@@ -235,47 +237,53 @@ export async function getRecords(
 
 export async function createRecord(collectionId: string, data: Record<string, unknown>) {
   const col = await db.collection.findUnique({ where: { id: collectionId } });
+  const finalData = await applyExtensions(collectionId, data, "create");
 
   if (col?.tableName) {
-    const record = await insertDynamicRow(col.tableName, collectionId, data);
+    const record = await insertDynamicRow(col.tableName, collectionId, finalData);
     revalidatePath(`/collections/${collectionId}/data`);
     fireWebhooks("record.create", collectionId, col.name, { id: record.id, ...data }).catch(() => {});
     logAudit("create", "record", record.id, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.create", collectionId, { id: record.id, ...data }).catch(() => {});
     return { ok: true, record };
   }
 
   // Legacy JSON blob path
   const record = await db.record.create({
-    data: { collectionId, data: JSON.stringify(data) },
+    data: { collectionId, data: JSON.stringify(finalData) },
   });
   revalidatePath(`/collections/${collectionId}/data`);
   if (col) {
-    fireWebhooks("record.create", collectionId, col.name, { id: record.id, ...data }).catch(() => {});
+    fireWebhooks("record.create", collectionId, col.name, { id: record.id, ...finalData }).catch(() => {});
     logAudit("create", "record", record.id, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.create", collectionId, { id: record.id, ...finalData }).catch(() => {});
   }
   return { ok: true, record };
 }
 
 export async function updateRecord(recordId: string, collectionId: string, data: Record<string, unknown>) {
   const col = await db.collection.findUnique({ where: { id: collectionId } });
+  const finalData = await applyExtensions(collectionId, data, "update");
 
   if (col?.tableName) {
-    const record = await updateDynamicRow(col.tableName, collectionId, recordId, data);
+    const record = await updateDynamicRow(col.tableName, collectionId, recordId, finalData);
     revalidatePath(`/collections/${collectionId}/data`);
     fireWebhooks("record.update", collectionId, col.name, { id: recordId, ...data }).catch(() => {});
     logAudit("update", "record", recordId, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.update", collectionId, { id: recordId, ...data }).catch(() => {});
     return { ok: true, record };
   }
 
   // Legacy JSON blob path
   const record = await db.record.update({
     where: { id: recordId },
-    data:  { data: JSON.stringify(data) },
+    data:  { data: JSON.stringify(finalData) },
   });
   revalidatePath(`/collections/${collectionId}/data`);
   if (col) {
     fireWebhooks("record.update", collectionId, col.name, { id: recordId, ...data }).catch(() => {});
     logAudit("update", "record", recordId, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.update", collectionId, { id: recordId, ...data }).catch(() => {});
   }
   return { ok: true, record };
 }
@@ -288,6 +296,7 @@ export async function deleteRecord(recordId: string, collectionId: string) {
     revalidatePath(`/collections/${collectionId}/data`);
     fireWebhooks("record.delete", collectionId, col.name, { id: recordId }).catch(() => {});
     logAudit("delete", "record", recordId, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.delete", collectionId, { id: recordId }).catch(() => {});
     return { ok: true };
   }
 
@@ -297,6 +306,7 @@ export async function deleteRecord(recordId: string, collectionId: string) {
   if (col) {
     fireWebhooks("record.delete", collectionId, col.name, { id: recordId }).catch(() => {});
     logAudit("delete", "record", recordId, { collectionName: col.name }).catch(() => {});
+    triggerFlows("record.delete", collectionId, { id: recordId }).catch(() => {});
   }
   return { ok: true };
 }

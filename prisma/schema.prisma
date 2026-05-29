@@ -160,6 +160,41 @@ model Relation {
   @@unique([collectionId, fieldName])
 }
 
+model Extension {
+  id           String   @id @default(cuid())
+  pluginId     String   // built-in plugin slug e.g. "auto-slug"
+  active       Boolean  @default(true)
+  config       String   @default("{}") // JSON config specific to the plugin
+  collectionId String?  // null = fires on all collections
+  events       String   @default("create,update") // comma-separated: "create" | "update"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Flow {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean   @default(true)
+  trigger     String    // JSON: { type, collectionId?, collectionName? }
+  steps       String    @default("[]") // JSON array of step objects
+  runCount    Int       @default(0)
+  lastRunAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  runs        FlowRun[]
+}
+
+model FlowRun {
+  id        String    @id @default(cuid())
+  flowId    String
+  flow      Flow      @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  status    String    // "success" | "error"
+  log       String    @default("[]") // JSON array of log lines
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+}
+
 model GitIntegration {
   id             String    @id @default("singleton")
   enabled        Boolean   @default(false)
