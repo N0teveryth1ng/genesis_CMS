@@ -87,6 +87,72 @@ export async function dropJunctionTable(junctionTable: string): Promise<void> {
   await db.$executeRawUnsafe(`DROP TABLE IF EXISTS ${ident(junctionTable)}`);
 }
 
+// ── Advanced query types ──────────────────────────────────────
+
+export type FilterOp = "_eq" | "_neq" | "_lt" | "_lte" | "_gt" | "_gte" | "_contains" | "_null" | "_in";
+
+export type FilterClause = {
+  field: string;
+  op:    FilterOp;
+  value: unknown;
+};
+
+export type SortClause = { field: string; dir: "ASC" | "DESC" };
+
+export type AdvancedQueryOpts = {
+  filters?:  FilterClause[];
+  sort?:     SortClause;
+  fields?:   string[];           // undefined = all columns
+  search?:   { term: string; textFields: string[] };
+  page:      number;
+  pageSize:  number;
+};
+
+function buildWhere(
+  filters: FilterClause[] = [],
+  search?: { term: string; textFields: string[] },
+  startIdx = 1,
+): { sql: string; params: unknown[]; nextIdx: number } {
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+  let idx = startIdx;
+
+  for (const f of filters) {
+    const col = ident(f.field);
+    switch (f.op) {
+      case "_eq":       conditions.push(`${col} = $${idx++}`);             params.push(f.value); break;
+      case "_neq":      conditions.push(`${col} != $${idx++}`);            params.push(f.value); break;
+      case "_lt":       conditions.push(`${col} < $${idx++}`);             params.push(f.value); break;
+      case "_lte":      conditions.push(`${col} <= $${idx++}`);            params.push(f.value); break;
+      case "_gt":       conditions.push(`${col} > $${idx++}`);             params.push(f.value); break;
+      case "_gte":      conditions.push(`${col} >= $${idx++}`);            params.push(f.value); break;
+      case "_contains": conditions.push(`${col}::text ILIKE $${idx++}`);   params.push(`%${f.value}%`); break;
+      case "_null":     conditions.push(f.value ? `${col} IS NULL` : `${col} IS NOT NULL`); break;
+      case "_in": {
+        const vals = Array.isArray(f.value) ? f.value : String(f.value).split(",");
+        const ph   = vals.map(() => `$${idx++}`).join(", ");
+        conditions.push(`${col} = ANY(ARRAY[${ph}])`);
+        params.push(...vals);
+        break;
+      }
+    }
+  }
+
+  if (search?.term && search.textFields.length > 0) {
+    const sub = search.textFields.map((f) => {
+      params.push(`%${search.term}%`);
+      return `${ident(f)}::text ILIKE $${idx++}`;
+    });
+    conditions.push(`(${sub.join(" OR ")})`);
+  }
+
+  return {
+    sql:     conditions.length ? `WHERE ${conditions.join(" AND ")}` : "",
+    params,
+    nextIdx: idx,
+  };
+}
+
 // ── Shared return shape ───────────────────────────────────────
 
 type DynRecord = {
@@ -205,6 +271,39 @@ export async function queryDynamicRows(
     db.$queryRawUnsafe<Array<{ count: string }>>(
       `SELECT COUNT(*) AS count FROM ${ident(tableName)}`,
     ),
+  ]);
+
+  const total   = parseInt(countResult[0]?.count ?? "0", 10);
+  const records = rows.map((r) => rowToRecord(r, collectionId));
+  return { records, total, page, pageSize };
+}
+
+export async function queryDynamicRowsAdvanced(
+  tableName: string,
+  collectionId: string,
+  opts: AdvancedQueryOpts,
+): Promise<{ records: DynRecord[]; total: number; page: number; pageSize: number }> {
+  const { filters, sort, fields, search, page, pageSize } = opts;
+  const offset = (page - 1) * pageSize;
+
+  const { sql: whereSQL, params: whereParams, nextIdx } = buildWhere(filters, search);
+
+  // SELECT clause — always include system columns
+  const selectCols = fields && fields.length > 0
+    ? [...new Set(["id", "created_at", "updated_at", ...fields])].map(ident).join(", ")
+    : "*";
+
+  // ORDER BY
+  const orderSQL = sort
+    ? `ORDER BY ${ident(sort.field)} ${sort.dir}`
+    : `ORDER BY "created_at" DESC`;
+
+  const dataSQL  = `SELECT ${selectCols} FROM ${ident(tableName)} ${whereSQL} ${orderSQL} LIMIT $${nextIdx} OFFSET $${nextIdx + 1}`;
+  const countSQL = `SELECT COUNT(*) AS count FROM ${ident(tableName)} ${whereSQL}`;
+
+  const [rows, countResult] = await Promise.all([
+    db.$queryRawUnsafe<Array<Record<string, unknown>>>(dataSQL, ...whereParams, pageSize, offset),
+    db.$queryRawUnsafe<Array<{ count: string }>>(countSQL, ...whereParams),
   ]);
 
   const total   = parseInt(countResult[0]?.count ?? "0", 10);

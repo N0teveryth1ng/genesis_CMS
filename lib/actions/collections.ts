@@ -16,7 +16,12 @@ import {
   deleteDynamicRow,
   getDynamicRow,
   queryDynamicRows,
+  queryDynamicRowsAdvanced,
+  type FilterClause,
+  type SortClause,
 } from "@/lib/db-dynamic";
+
+export type { FilterClause, SortClause };
 
 /* ── Collections ─────────────────────────────────────────── */
 
@@ -177,15 +182,39 @@ export async function reorderFields(collectionId: string, orderedIds: string[]) 
 
 /* ── Records ─────────────────────────────────────────────── */
 
-export async function getRecords(collectionId: string, page = 1, pageSize = 50) {
-  const col = await db.collection.findUnique({ where: { id: collectionId } });
+export async function getRecords(
+  collectionId: string,
+  page = 1,
+  pageSize = 50,
+  opts?: {
+    search?:  string;
+    sort?:    SortClause;
+    filters?: FilterClause[];
+    fields?:  string[];
+  },
+) {
+  const col = await db.collection.findUnique({
+    where: { id: collectionId },
+    include: { fields: { where: { hidden: false } } },
+  });
 
   if (col?.tableName) {
-    return queryDynamicRows(col.tableName, collectionId, page, pageSize);
+    const textFields = (col.fields ?? [])
+      .filter((f) => ["text", "textarea", "email", "url"].includes(f.type))
+      .map((f) => f.name);
+
+    return queryDynamicRowsAdvanced(col.tableName, collectionId, {
+      filters:  opts?.filters,
+      sort:     opts?.sort,
+      fields:   opts?.fields,
+      search:   opts?.search ? { term: opts.search, textFields } : undefined,
+      page,
+      pageSize,
+    });
   }
 
-  // Legacy JSON blob path
-  const [records, total] = await Promise.all([
+  // Legacy JSON blob path — in-memory sort/search for small datasets
+  const [allRecords, total] = await Promise.all([
     db.record.findMany({
       where:   { collectionId },
       orderBy: { createdAt: "desc" },
@@ -194,6 +223,14 @@ export async function getRecords(collectionId: string, page = 1, pageSize = 50) 
     }),
     db.record.count({ where: { collectionId } }),
   ]);
+
+  let records = allRecords;
+
+  if (opts?.search) {
+    const term = opts.search.toLowerCase();
+    records = records.filter((r) => r.data.toLowerCase().includes(term));
+  }
+
   return { records, total, page, pageSize };
 }
 

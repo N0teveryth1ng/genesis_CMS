@@ -3,11 +3,36 @@ import { createHash } from "crypto";
 import { db } from "@/lib/db";
 import { fireWebhooks } from "@/lib/actions/webhooks";
 import {
-  queryDynamicRows,
+  queryDynamicRowsAdvanced,
   insertDynamicRow,
   getDynamicRow,
+  type FilterClause,
+  type FilterOp,
+  type SortClause,
 } from "@/lib/db-dynamic";
 import { getRelations } from "@/lib/actions/relations";
+
+/* ── Query param parsers ─────────────────────────────────── */
+function parseFilters(sp: URLSearchParams): FilterClause[] {
+  const out: FilterClause[] = [];
+  for (const [key, value] of sp.entries()) {
+    const m = key.match(/^filter\[([^\]]+)\]\[([^\]]+)\]$/);
+    if (!m) continue;
+    out.push({ field: m[1], op: m[2] as FilterOp, value });
+  }
+  return out;
+}
+
+function parseSort(s: string | null): SortClause | undefined {
+  if (!s) return undefined;
+  const desc = s.startsWith("-");
+  return { field: desc ? s.slice(1) : s, dir: desc ? "DESC" : "ASC" };
+}
+
+function parseFields(s: string | null): string[] | undefined {
+  if (!s) return undefined;
+  return s.split(",").map((f) => f.trim()).filter(Boolean);
+}
 
 export const runtime = "nodejs";
 
@@ -60,13 +85,29 @@ export async function GET(
   });
   if (!col) return NextResponse.json({ error: "Collection not found" }, { status: 404 });
 
-  const url   = new URL(req.url);
-  const page  = Math.max(1, parseInt(url.searchParams.get("page")  ?? "1",  10));
-  const limit = Math.min(100, parseInt(url.searchParams.get("limit") ?? "50", 10));
+  const url     = new URL(req.url);
+  const sp      = url.searchParams;
+  const page    = Math.max(1, parseInt(sp.get("page")   ?? "1",  10));
+  const limit   = Math.min(100, parseInt(sp.get("limit") ?? "50", 10));
+  const filters = parseFilters(sp);
+  const sort    = parseSort(sp.get("sort"));
+  const fields  = parseFields(sp.get("fields"));
+  const search  = sp.get("search") ?? undefined;
 
   // Dynamic table path
   if (col.tableName) {
-    const { records, total } = await queryDynamicRows(col.tableName, col.id, page, limit);
+    const textFields = col.fields
+      .filter((f) => ["text", "textarea", "email", "url"].includes(f.type))
+      .map((f) => f.name);
+
+    const { records, total } = await queryDynamicRowsAdvanced(col.tableName, col.id, {
+      filters,
+      sort,
+      fields,
+      search: search ? { term: search, textFields } : undefined,
+      page,
+      pageSize: limit,
+    });
 
     // Fetch M2O relations for populate
     const m2oRelations = populate
@@ -115,8 +156,12 @@ export async function GET(
   ]);
 
   const relationFields = col.fields.filter((f) => f.type === "relation");
+  // Legacy path applies basic text search in-memory
+  const filteredRecords = search
+    ? records.filter((r) => r.data.toLowerCase().includes(search.toLowerCase()))
+    : records;
 
-  const data = await Promise.all(records.map(async (r) => {
+  const data = await Promise.all(filteredRecords.map(async (r) => {
     let parsed: Record<string, unknown> = {};
     try { parsed = JSON.parse(r.data); } catch { /* empty */ }
 
@@ -134,6 +179,12 @@ export async function GET(
           });
         } catch { /* skip */ }
       }
+    }
+
+    // Field selection for legacy path
+    if (fields && fields.length > 0) {
+      const kept = new Set(["id", "createdAt", "updatedAt", ...fields]);
+      Object.keys(parsed).forEach((k) => { if (!kept.has(k)) delete parsed[k]; });
     }
 
     return { id: r.id, ...parsed, createdAt: r.createdAt, updatedAt: r.updatedAt };

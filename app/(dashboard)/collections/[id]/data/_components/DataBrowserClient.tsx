@@ -3,14 +3,14 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, ArrowLeft, Trash2, Edit2, Loader2,
+  Plus, Trash2, Edit2, Loader2,
   Database, FileText, Users, Image, ShoppingCart,
   Tag, Mail, Calendar, Globe, BarChart2, Bookmark,
   MessageSquare, Package, Star, Heart, Zap, Music,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown, X,
 } from "lucide-react";
 import Link from "next/link";
-import { deleteRecord, getRecords } from "@/lib/actions/collections";
+import { deleteRecord, getRecords, type SortClause } from "@/lib/actions/collections";
 import { deleteGitRecord, getGitRecords } from "@/lib/actions/git";
 import RecordFormModal from "./RecordFormModal";
 import type { Collection, Field, Record as PrismaRecord } from "@prisma/client";
@@ -115,21 +115,40 @@ export default function DataBrowserClient({
   const isGit = !!collection.isGitBacked;
 
   const visibleFields = collection.fields.filter((f) => !f.hidden);
-  const [records, setRecords] = useState<FlatRecord[]>(initialRecords.map(flattenRecord));
+  const [records, setRecords]       = useState<FlatRecord[]>(initialRecords.map(flattenRecord));
   const [modalRecord, setModalRecord] = useState<FlatRecord | null | "new">(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage]             = useState(1);
+  const [totalCount, setTotalCount] = useState(total);
+  const [search, setSearch]         = useState("");
+  const [sort, setSort]             = useState<SortClause | undefined>(undefined);
   const [loadingPage, startPageTransition] = useTransition();
-  const pageSize = 50;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pageSize  = 50;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-  function goToPage(p: number) {
+  function fetchPage(p: number, searchTerm = search, sortOpts = sort) {
     startPageTransition(async () => {
       const res = isGit
         ? await getGitRecords(collection.id, p, pageSize)
-        : await getRecords(collection.id, p, pageSize);
+        : await getRecords(collection.id, p, pageSize, { search: searchTerm || undefined, sort: sortOpts });
       setRecords(res.records.map(flattenRecord));
+      setTotalCount(res.total);
       setPage(p);
     });
+  }
+
+  function goToPage(p: number) { fetchPage(p); }
+
+  function handleSearch(term: string) {
+    setSearch(term);
+    fetchPage(1, term, sort);
+  }
+
+  function handleSort(field: string) {
+    const next: SortClause = sort?.field === field && sort.dir === "ASC"
+      ? { field, dir: "DESC" }
+      : { field, dir: "ASC" };
+    setSort(next);
+    fetchPage(1, search, next);
   }
 
 
@@ -169,7 +188,7 @@ export default function DataBrowserClient({
           </div>
           <div>
             <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>{collection.label}</h1>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{total} record{total !== 1 ? "s" : ""}</p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{totalCount} record{totalCount !== 1 ? "s" : ""}</p>
           </div>
         </div>
         {canCreate && (
@@ -182,6 +201,32 @@ export default function DataBrowserClient({
           </button>
         )}
       </div>
+
+      {/* Search bar */}
+      {!isGit && (
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 max-w-sm">
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
+            <input
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Search records…"
+              className="w-full pl-8 pr-8 py-2 rounded-lg text-sm outline-none"
+              style={{ background: "var(--bg-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
+            />
+            {search && (
+              <button onClick={() => handleSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2"
+                style={{ color: "var(--text-muted)" }}>
+                <X size={12} />
+              </button>
+            )}
+          </div>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {totalCount} record{totalCount !== 1 ? "s" : ""}
+            {search && " (filtered)"}
+          </p>
+        </div>
+      )}
 
       {/* Table */}
       <div className="rounded-xl overflow-hidden"
@@ -208,9 +253,16 @@ export default function DataBrowserClient({
                   </th>
                   {visibleFields.map((f) => (
                     <th key={f.id}
-                      className="text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap"
-                      style={{ color: "var(--text-muted)" }}>
-                      {f.label}
+                      className="text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap cursor-pointer select-none"
+                      style={{ color: sort?.field === f.name ? "var(--primary)" : "var(--text-muted)" }}
+                      onClick={() => !isGit && handleSort(f.name)}
+                    >
+                      <span className="flex items-center gap-1">
+                        {f.label}
+                        {sort?.field === f.name
+                          ? sort.dir === "ASC" ? <ChevronUp size={11} /> : <ChevronDown size={11} />
+                          : <ChevronDown size={11} style={{ opacity: 0.3 }} />}
+                      </span>
                     </th>
                   ))}
                   <th className="text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap"
