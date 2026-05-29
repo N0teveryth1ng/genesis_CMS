@@ -2,20 +2,25 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPageBySlug } from "@/lib/actions/pages";
 import type { Block, BlockStyle } from "@/app/(dashboard)/pages/_components/PageEditor";
+import { FormBlock } from "@/app/site/_components/FormBlock";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const page = await getPageBySlug(slug);
-  return { title: page?.seoTitle ?? page?.title ?? slug };
+  if (!page) return {};
+  const title = page.seoTitle ?? page.title;
+  const description = (page as typeof page & { seoDesc?: string }).seoDesc ?? undefined;
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: "website" },
+    twitter:   { card: "summary_large_image", title, description },
+  };
 }
 
 /* ── Style helpers ───────────────────────────────────────── */
 const PY: Record<string, string> = {
-  none: "0px 24px",
-  sm:   "32px 24px",
-  md:   "56px 24px",
-  lg:   "80px 24px",
-  xl:   "96px 24px",
+  none: "0px 24px", sm: "32px 24px", md: "56px 24px", lg: "80px 24px", xl: "96px 24px",
 };
 const FS: Record<string, string> = {
   sm: "0.875rem", base: "1rem", lg: "1.125rem", xl: "1.25rem",
@@ -27,7 +32,6 @@ const BR: Record<string, string> = {
   none: "0", sm: "8px", md: "16px", lg: "24px",
 };
 
-// Styles for the optional outer wrapper div (font, alignment, border-radius)
 function outerWrapStyle(s?: BlockStyle): React.CSSProperties {
   if (!s) return {};
   const hasRadius = s.borderRadius && s.borderRadius !== "none";
@@ -39,7 +43,6 @@ function outerWrapStyle(s?: BlockStyle): React.CSSProperties {
   };
 }
 
-// Resolved section background, color, and padding
 function bg(s: BlockStyle | undefined, dataBg?: string, def = "transparent") {
   return s?.bg ?? dataBg ?? def;
 }
@@ -69,11 +72,9 @@ function NavbarBlock({ data }: { data: Record<string, string> }) {
 }
 
 function HeroBlock({ data, style }: { data: Record<string, string>; style?: BlockStyle }) {
-  const align  = (data.align ?? "center") as "left" | "center" | "right";
-  const bgCol  = bg(style, data.bg, "#0f172a");
-  const txtCol = color(style, data.color, "#ffffff");
+  const align = (data.align ?? "center") as "left" | "center" | "right";
   return (
-    <section style={{ background: bgCol, color: txtCol, padding: pad(style, "96px 24px"), textAlign: align }}>
+    <section style={{ background: bg(style, data.bg, "#0f172a"), color: color(style, data.color, "#ffffff"), padding: pad(style, "96px 24px"), textAlign: align }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, lineHeight: 1.15, margin: 0 }}>
           {data.heading}
@@ -104,12 +105,12 @@ function FeaturesBlock({ data, style }: { data: Record<string, string>; style?: 
   return (
     <section style={{ padding: pad(style, "72px 24px"), background: bg(style, undefined, "#ffffff"), color: color(style) }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        {data.heading && <h2 style={{ textAlign: "center", fontSize: "2rem", fontWeight: 700, color: color(style, undefined, "#111827"), marginBottom: 48 }}>{data.heading}</h2>}
+        {data.heading && <h2 style={{ textAlign: "center", fontSize: "2rem", fontWeight: 700, color: color(style, undefined, "#111827"), marginBottom: 48, margin: "0 0 48px" }}>{data.heading}</h2>}
         <div style={{ display: "grid", gridTemplateColumns: `repeat(${features.length}, 1fr)`, gap: 32 }}>
           {features.map((f, i) => (
             <div key={i} style={{ background: "#f9fafb", borderRadius: 12, padding: "32px 24px", textAlign: "center" }}>
               <div style={{ width: 48, height: 48, borderRadius: 12, background: "#e0f2fe", margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem" }}>✦</div>
-              <h3 style={{ fontWeight: 700, color: "#111827", marginBottom: 8 }}>{f.title}</h3>
+              <h3 style={{ fontWeight: 700, color: "#111827", marginBottom: 8, margin: "0 0 8px" }}>{f.title}</h3>
               <p style={{ color: "#6b7280", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
@@ -123,7 +124,7 @@ function TestimonialBlock({ data, style }: { data: Record<string, string>; style
   return (
     <section style={{ padding: pad(style, "72px 24px"), background: bg(style, data.bg, "#f8fafc"), textAlign: "center", color: color(style) }}>
       <div style={{ maxWidth: 680, margin: "0 auto" }}>
-        <p style={{ fontSize: "1.375rem", fontStyle: "italic", color: color(style, undefined, "#374151"), lineHeight: 1.7, marginBottom: 24 }}>
+        <p style={{ fontSize: "1.375rem", fontStyle: "italic", color: color(style, undefined, "#374151"), lineHeight: 1.7, marginBottom: 24, margin: "0 0 24px" }}>
           &ldquo;{data.quote}&rdquo;
         </p>
         <div>
@@ -139,7 +140,7 @@ function ContactBlock({ data, style }: { data: Record<string, string>; style?: B
   return (
     <section style={{ padding: pad(style, "72px 24px"), background: bg(style, data.bg, "#f8fafc"), color: color(style) }}>
       <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-        {data.heading && <h2 style={{ fontSize: "2rem", fontWeight: 700, color: color(style, undefined, "#111827"), marginBottom: 32 }}>{data.heading}</h2>}
+        {data.heading && <h2 style={{ fontSize: "2rem", fontWeight: 700, color: color(style, undefined, "#111827"), margin: "0 0 32px" }}>{data.heading}</h2>}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {data.email && <a href={`mailto:${data.email}`} style={{ color: "#0ea5e9", fontSize: "1.125rem", textDecoration: "none" }}>✉ {data.email}</a>}
           {data.phone && <span style={{ color: color(style, undefined, "#374151"), fontSize: "1rem" }}>📞 {data.phone}</span>}
@@ -151,11 +152,9 @@ function ContactBlock({ data, style }: { data: Record<string, string>; style?: B
 }
 
 function FooterBlock({ data, style }: { data: Record<string, string>; style?: BlockStyle }) {
-  const links  = (data.links ?? "").split(",").map((l) => l.trim()).filter(Boolean);
-  const bgCol  = bg(style, data.bg, "#0f172a");
-  const txtCol = color(style, data.color, "#ffffff");
+  const links = (data.links ?? "").split(",").map((l) => l.trim()).filter(Boolean);
   return (
-    <footer style={{ background: bgCol, color: txtCol, padding: pad(style, "48px 24px 32px") }}>
+    <footer style={{ background: bg(style, data.bg, "#0f172a"), color: color(style, data.color, "#ffffff"), padding: pad(style, "48px 24px 32px") }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24, marginBottom: 32 }}>
           <span style={{ fontWeight: 800, fontSize: "1.125rem" }}>{data.logo || "Brand"}</span>
@@ -190,9 +189,7 @@ function ImageBlock({ data, style }: { data: Record<string, string>; style?: Blo
       <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={data.url} alt={data.alt ?? ""} style={{ maxWidth: "100%", borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,0.1)" }} />
-        {data.caption && (
-          <p style={{ marginTop: 10, fontSize: "0.875rem", color: "#6b7280" }}>{data.caption}</p>
-        )}
+        {data.caption && <p style={{ marginTop: 10, fontSize: "0.875rem", color: "#6b7280" }}>{data.caption}</p>}
       </div>
     </section>
   );
@@ -234,7 +231,8 @@ function ColumnsBlock({ data, style }: { data: Record<string, string>; style?: B
   );
 }
 
-function RenderBlock({ block }: { block: Block }) {
+/* ── RenderBlock ─────────────────────────────────────────── */
+function RenderBlock({ block, page }: { block: Block; page: { id: string; slug: string } }) {
   const ws      = outerWrapStyle(block.style);
   const hasWrap = Object.keys(ws).length > 0;
 
@@ -251,6 +249,15 @@ function RenderBlock({ block }: { block: Block }) {
       case "button":      return <ButtonBlock      data={block.data} style={block.style} />;
       case "divider":     return <DividerBlock     style={block.style} />;
       case "columns":     return <ColumnsBlock     data={block.data} style={block.style} />;
+      case "form":        return (
+        <FormBlock
+          data={block.data}
+          pageId={page.id}
+          pageSlug={page.slug}
+          blockId={block.id}
+          style={block.style}
+        />
+      );
       default:            return null;
     }
   })();
@@ -272,10 +279,12 @@ export default async function SitePage({
   let blocks: Block[] = [];
   try { blocks = JSON.parse(page.blocks) as Block[]; } catch { /* empty */ }
 
+  const pageInfo = { id: page.id, slug: page.slug };
+
   return (
     <main style={{ margin: 0, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: "#fff", minHeight: "100vh" }}>
       {blocks.map((block) => (
-        <RenderBlock key={block.id} block={block} />
+        <RenderBlock key={block.id} block={block} page={pageInfo} />
       ))}
       {blocks.length === 0 && (
         <div style={{ textAlign: "center", padding: "120px 24px", color: "#9ca3af" }}>

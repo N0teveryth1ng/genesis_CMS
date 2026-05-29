@@ -195,6 +195,15 @@ model FlowRun {
   endedAt   DateTime?
 }
 
+model FormSubmission {
+  id        String   @id @default(cuid())
+  pageId    String
+  pageSlug  String
+  blockId   String
+  data      String   @default("{}") // JSON: { fieldLabel: value }
+  createdAt DateTime @default(now())
+}
+
 model GitIntegration {
   id             String    @id @default("singleton")
   enabled        Boolean   @default(false)
