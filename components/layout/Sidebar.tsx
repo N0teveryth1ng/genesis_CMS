@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutGrid, Database, FolderOpen, Users, Settings,
   Zap, BarChart2, ChevronLeft, ChevronRight, Globe,
-  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate, PackageOpen,
+  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate, PackageOpen, Braces,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
@@ -18,6 +18,7 @@ const NAV_MAIN = [
   { label: "Files",          href: "/files",       icon: FolderOpen    },
   { label: "Live Preview",   href: "/preview",     icon: Globe         },
   { label: "Migration Kit",  href: "/migrate",     icon: PackageOpen   },
+  { label: "GraphQL",        href: "/graphql",     icon: Braces        },
   { label: "Flows",          href: "/flows",       icon: Zap           },
   { label: "Insights",       href: "/insights",    icon: BarChart2     },
 ];

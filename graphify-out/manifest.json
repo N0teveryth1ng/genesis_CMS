@@ -1,0 +1,1052 @@
+{
+  "D:\\genesis_CMS\\genesis-cms\\eslint.config.mjs": {
+    "mtime": 1778244954.645427,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\next.config.ts": {
+    "mtime": 1778640755.4922628,
+    "ast_hash": "d501650781dfaf115bb40b3ff93b55ab",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\package.json": {
+    "mtime": 1778640114.4380412,
+    "ast_hash": "52e952ba6e680b78766c770009d636fe",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\postcss.config.mjs": {
+    "mtime": 1778244954.656426,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma.config.ts": {
+    "mtime": 1778298817.804128,
+    "ast_hash": "36dd78c25114dcb00e9a724961c73a1d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\proxy.ts": {
+    "mtime": 1778640785.348662,
+    "ast_hash": "d9c8c250cc2a89d3936c13549b420eeb",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\tsconfig.json": {
+    "mtime": 1779260886.9441428,
+    "ast_hash": "22c2e7fffec6b88cf66d89e069968fc3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\error.tsx": {
+    "mtime": 1778640813.5420108,
+    "ast_hash": "a28fcb959f56d97e8b8f9c5ee5dd5d89",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\layout.tsx": {
+    "mtime": 1778297596.1420867,
+    "ast_hash": "801d9e06f4a5785459353e87e33cae38",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\not-found.tsx": {
+    "mtime": 1778640804.530733,
+    "ast_hash": "5fdf961f93fd2cbade2576b927964489",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(auth)\\login\\page.tsx": {
+    "mtime": 1778297606.928051,
+    "ast_hash": "f61d1a849aa5e95f6286bb7726139b47",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(auth)\\login\\_components\\LoginForm.tsx": {
+    "mtime": 1778297625.573058,
+    "ast_hash": "94a8fc05449447d999e9960b53832a83",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\layout.tsx": {
+    "mtime": 1778245402.6765876,
+    "ast_hash": "f21a593e0ebf0f90fa741ce3e202510e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\loading.tsx": {
+    "mtime": 1778640938.4993682,
+    "ast_hash": "47b563a2e690ed25b7327fffd1663b12",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\page.tsx": {
+    "mtime": 1778642000.0222182,
+    "ast_hash": "275d106d094a19b92a2454728f4b00d1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\api-keys\\page.tsx": {
+    "mtime": 1778600886.2281916,
+    "ast_hash": "63d271cdb9c0995cd81cfa5faae0a970",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\api-keys\\_components\\ApiKeysClient.tsx": {
+    "mtime": 1778647255.024368,
+    "ast_hash": "2794a1920de2ed9ff9cb860b025eef41",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\audit\\loading.tsx": {
+    "mtime": 1778640953.6585376,
+    "ast_hash": "31f576b21b5894ddb829291475e62b22",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\audit\\page.tsx": {
+    "mtime": 1778640258.6738093,
+    "ast_hash": "337530e019444da355041f6fcd48b5a8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\audit\\_components\\AuditClient.tsx": {
+    "mtime": 1778640296.552096,
+    "ast_hash": "187ebad6635e9b1c59f4adcd20ff3ab6",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\loading.tsx": {
+    "mtime": 1778640946.2211616,
+    "ast_hash": "acd691e4a26e617ac9a695ac96e8646a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\page.tsx": {
+    "mtime": 1779162646.9981594,
+    "ast_hash": "c4e8b3b9d8d9865e4042a06c5b93fe39",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\page.tsx": {
+    "mtime": 1779355454.9016738,
+    "ast_hash": "c0360b340a8d58997b9857aa575c7700",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\data\\page.tsx": {
+    "mtime": 1779162690.6964025,
+    "ast_hash": "fb3790492392e84349b7500c0e24d28f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\data\\_components\\DataBrowserClient.tsx": {
+    "mtime": 1779162850.7595913,
+    "ast_hash": "255b17b9f66b5fcbe25ddaf489c9af50",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\data\\_components\\RecordFormModal.tsx": {
+    "mtime": 1779162859.7472332,
+    "ast_hash": "daa3b9ae0f203bf46e565585a8502372",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\_components\\CollectionDetailClient.tsx": {
+    "mtime": 1779355503.1462657,
+    "ast_hash": "a52332e122f1908ac3cd4e6c9d2f5435",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\_components\\CreateRelationModal.tsx": {
+    "mtime": 1779355414.7340631,
+    "ast_hash": "033713ab77dbbf8a8b2df0697d650841",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\[id]\\_components\\RelationsSection.tsx": {
+    "mtime": 1779355443.8707888,
+    "ast_hash": "fa6b5eb7c8c3a914dcfe2675b741e970",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\_components\\CollectionsClient.tsx": {
+    "mtime": 1779354640.1251552,
+    "ast_hash": "ef359d2bcb9f9d6cc3eaa49dc359f7e2",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\collections\\_components\\IntrospectModal.tsx": {
+    "mtime": 1779354586.7414267,
+    "ast_hash": "f53983b91b1e6892c74d13f882ecf2ed",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\files\\page.tsx": {
+    "mtime": 1778599255.7537708,
+    "ast_hash": "661bfb7953c7c87270ab33add7fab25a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\files\\_components\\FilesClient.tsx": {
+    "mtime": 1778640315.783365,
+    "ast_hash": "60af7b4294ffb8594f52aaf2f39e7975",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\flows\\page.tsx": {
+    "mtime": 1778640920.0224025,
+    "ast_hash": "f956ad7cf9f9a9465cb56a1f3b97c2a6",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\insights\\page.tsx": {
+    "mtime": 1778640913.0044303,
+    "ast_hash": "29bc7c2f75dde13c77331a4cea62dbb0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\migrate\\page.tsx": {
+    "mtime": 1779249894.6707063,
+    "ast_hash": "ca2b5e6b7a4bedd0aefeca4cb4091e4b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\migrate\\_components\\MigrateClient.tsx": {
+    "mtime": 1779252596.3502047,
+    "ast_hash": "860082bf10d7c715886b507e7394ba2f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\pages\\page.tsx": {
+    "mtime": 1778761711.4438815,
+    "ast_hash": "be5ab908259216c4e8e2aa30f79706fa",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\pages\\[id]\\page.tsx": {
+    "mtime": 1778762032.3789039,
+    "ast_hash": "5bc27c0cd6197524a77b7f78338e6d29",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\pages\\_components\\PageEditor.tsx": {
+    "mtime": 1779249235.2893755,
+    "ast_hash": "ac5f58797fee61bf103898083d759f92",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\pages\\_components\\PagesClient.tsx": {
+    "mtime": 1778761752.760327,
+    "ast_hash": "84d6b104bfa4bca9db722bd65729bfff",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\preview\\page.tsx": {
+    "mtime": 1779259374.5447707,
+    "ast_hash": "5326c216e6cdb46ac7ee82e02d392663",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\preview\\_components\\PageBlocksEditor.tsx": {
+    "mtime": 1779255585.150569,
+    "ast_hash": "4356b7ded6f0616aedd3c7a812531ae8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\preview\\_components\\SiteContentEditor.tsx": {
+    "mtime": 1779259366.3077629,
+    "ast_hash": "5a71e6fb0d18ff63539c3897bcfd386f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\roles\\page.tsx": {
+    "mtime": 1778638305.9629533,
+    "ast_hash": "7c152483d735fc42991f34b624a82fe0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\roles\\_components\\PermissionsClient.tsx": {
+    "mtime": 1778637868.3793092,
+    "ast_hash": "b63764f2dd57dcdac2023638980752c7",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\settings\\page.tsx": {
+    "mtime": 1779163819.2944436,
+    "ast_hash": "6f207d60b463c7e5a1d06c29469947a2",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\settings\\_components\\SettingsClient.tsx": {
+    "mtime": 1779258822.5075295,
+    "ast_hash": "f6995530bbe03ff6c74b7405cd8c00ab",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\users\\page.tsx": {
+    "mtime": 1778599906.1105578,
+    "ast_hash": "8f4aabb99ab0d29c6129801ebb866684",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\users\\_components\\UserFormModal.tsx": {
+    "mtime": 1778599567.2725365,
+    "ast_hash": "6223b84fc8b1af896e7a93d0c5dc1ca9",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\users\\_components\\UsersClient.tsx": {
+    "mtime": 1778599899.9004698,
+    "ast_hash": "f751958c57982ff96e1c4c4f95eeb44a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\webhooks\\page.tsx": {
+    "mtime": 1778639595.4200835,
+    "ast_hash": "047da2246b2ebd0fa319abea411102a4",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\(dashboard)\\webhooks\\_components\\WebhooksClient.tsx": {
+    "mtime": 1778639589.7919102,
+    "ast_hash": "ad658a4cd528bd4e6756b1c7ae59e1de",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\auth\\github\\callback\\route.ts": {
+    "mtime": 1779163805.3820062,
+    "ast_hash": "d10c4b81bcf1fc111a477af15f0ffbd9",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\auth\\[...nextauth]\\route.ts": {
+    "mtime": 1778297577.1897285,
+    "ast_hash": "df21b367043222699c0e6a3e803425b4",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\preview-proxy\\route.ts": {
+    "mtime": 1779260804.732471,
+    "ast_hash": "cdc01fea3dce011f15e389e1c5dffa86",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\upload\\route.ts": {
+    "mtime": 1778640138.0583677,
+    "ast_hash": "80bee02aae16fb3087e46d531260730a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\v1\\[collection]\\route.ts": {
+    "mtime": 1779355525.4286404,
+    "ast_hash": "eb7f89b2d7196692c5e3b21d4feda559",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\api\\v1\\[collection]\\[id]\\route.ts": {
+    "mtime": 1779353984.3146248,
+    "ast_hash": "81b3a326eb46d7c605d69c095180385d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\site\\layout.tsx": {
+    "mtime": 1778762780.2312222,
+    "ast_hash": "ff8abe02a9885b2edfe85529441031d0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\app\\site\\[slug]\\page.tsx": {
+    "mtime": 1779249282.7327297,
+    "ast_hash": "9d5a34f6a40f85d60e002edc096e0eca",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\collections\\CreateCollectionModal.tsx": {
+    "mtime": 1778476051.0834613,
+    "ast_hash": "423a0f1f1271ecd9e102ca7ebb8daa49",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\collections\\FieldBuilder.tsx": {
+    "mtime": 1778638688.5378432,
+    "ast_hash": "d858e4a64898d5326e437150ea9de8d1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\layout\\CommandPalette.tsx": {
+    "mtime": 1778474328.4191158,
+    "ast_hash": "d27fb7df14c11922f1dc529e98186ad8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\layout\\DashboardLayout.tsx": {
+    "mtime": 1778474336.8044713,
+    "ast_hash": "bc30665ddf1bf01ecd1b712841904d4a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\layout\\Header.tsx": {
+    "mtime": 1778644610.1919017,
+    "ast_hash": "99122dcdc72ed00ac9b63733db2450ff",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\layout\\Sidebar.tsx": {
+    "mtime": 1779250178.4499054,
+    "ast_hash": "b876464f867a38a8060f54bb2a47c5c8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\components\\providers\\AuthProvider.tsx": {
+    "mtime": 1778297585.7899585,
+    "ast_hash": "c5e036f5317bcde421af342735c01c2d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\auth.ts": {
+    "mtime": 1778298537.7876132,
+    "ast_hash": "367c48443b1efa2703c6e815ae5753d4",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\db-dynamic.ts": {
+    "mtime": 1779355350.8250878,
+    "ast_hash": "c4db9b00fecd67e6955856bd56e98e61",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\db-introspect.ts": {
+    "mtime": 1779354512.5432894,
+    "ast_hash": "eedca8e85cf3a234a08b5619ba8e34db",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\db.ts": {
+    "mtime": 1778298527.7433174,
+    "ast_hash": "7efc67ccca0a5bc21f861208df0778aa",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\ratelimit.ts": {
+    "mtime": 1778640774.0600245,
+    "ast_hash": "7f9c83ea6efc854af187c2aa6d160e73",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\utils.ts": {
+    "mtime": 1778245260.7794454,
+    "ast_hash": "35f287fc72e9d97088352f358d580614",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\apikeys.ts": {
+    "mtime": 1778600862.247594,
+    "ast_hash": "f78b0b4b1df590d7e3491f0c1da43076",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\audit.ts": {
+    "mtime": 1778640156.129842,
+    "ast_hash": "391c09f307bd1996dbaca66b95ca0e0d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\collections.ts": {
+    "mtime": 1779353932.5529015,
+    "ast_hash": "9af4436cec5731b786552ef47b7b98a5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\files.ts": {
+    "mtime": 1778599233.9638104,
+    "ast_hash": "b86e39e6fd65d6210ee6a80593e434b8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\git.ts": {
+    "mtime": 1779249823.3172514,
+    "ast_hash": "e7cf89af1c7cb1a9b50961d57c641621",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\introspect.ts": {
+    "mtime": 1779354541.7542744,
+    "ast_hash": "951e3de74bf44175700da9fee412a69d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\migrate.ts": {
+    "mtime": 1779257304.4428067,
+    "ast_hash": "c8a24b4fd9451085aff686f7f42af949",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\pages.ts": {
+    "mtime": 1778761659.142471,
+    "ast_hash": "e214320b9aa05c09e53e9890b48fb5dd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\permissions.ts": {
+    "mtime": 1778637809.3109324,
+    "ast_hash": "727f80cbce0a5a12ae5eb1977874edd2",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\relations.ts": {
+    "mtime": 1779355367.294918,
+    "ast_hash": "078cb253199b007c83b568ffb911e1ba",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\sandbox.ts": {
+    "mtime": 1779260079.6443164,
+    "ast_hash": "6bf77962ebebe3de001cc899ee81a3fd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\settings.ts": {
+    "mtime": 1779163814.9084435,
+    "ast_hash": "5de30ba480ef3e5df364b70431df54eb",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\users.ts": {
+    "mtime": 1778640221.698971,
+    "ast_hash": "4fe372d0c43ee6dc9335bf50e93681f6",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\actions\\webhooks.ts": {
+    "mtime": 1778640239.3406758,
+    "ast_hash": "12e0573a165cc540d5e2b8c230df0bf5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\lib\\stores\\ui.ts": {
+    "mtime": 1778474153.1580572,
+    "ast_hash": "d8afcdb665db67224644a31b1564795d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260513015339_init\\migration.sql": {
+    "mtime": 1778637219.466961,
+    "ast_hash": "9855c744d084bac4cff690049524ac99",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260513020309_add_permissions\\migration.sql": {
+    "mtime": 1778637789.828097,
+    "ast_hash": "68c0f4a060c792240dd07239626d27a1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260513022928_add_webhooks\\migration.sql": {
+    "mtime": 1778639368.4975283,
+    "ast_hash": "033a68f1d0bca89d78a2781dafdc57a1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260513024124_add_audit_log_and_thumbnail\\migration.sql": {
+    "mtime": 1778640084.570738,
+    "ast_hash": "d15ec6ac873e022ce71d46bee5f67aa3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260514122621_add_pages\\migration.sql": {
+    "mtime": 1778761581.3437395,
+    "ast_hash": "41eb672e97e88dc3aafadf0f76fb5281",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260520000000_add_git_integration\\migration.sql": {
+    "mtime": 1779247924.789074,
+    "ast_hash": "8cd75630e629751a18b2bc6792a63078",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260521000001_collection_table_name\\migration.sql": {
+    "mtime": 1779353865.307127,
+    "ast_hash": "35203f491aabf359e5f1912c6e68d278",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\prisma\\migrations\\20260521000002_relations\\migration.sql": {
+    "mtime": 1779355317.6828797,
+    "ast_hash": "517bb442540871a4ff64fce41690091f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\.genesis\\config.json": {
+    "mtime": 1779165924.232754,
+    "ast_hash": "5bc1dad83eba973fcaf7a5fc51281ed0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\content\\posts\\welcome-to-genesis.json": {
+    "mtime": 1779165924.242608,
+    "ast_hash": "22119c851fa37bfceb89754e287e3bd8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\.genesis\\config.json": {
+    "mtime": 1779248888.9131334,
+    "ast_hash": "5bc1dad83eba973fcaf7a5fc51281ed0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\content\\posts\\welcome-to-genesis.json": {
+    "mtime": 1779248888.924191,
+    "ast_hash": "22119c851fa37bfceb89754e287e3bd8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\.sow-temp-store.json": {
+    "mtime": 1779259489.9014702,
+    "ast_hash": "28568ccff807e2ca740db7d3efcb0134",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\eslint.config.mjs": {
+    "mtime": 1779259489.9037285,
+    "ast_hash": "6c4307ffa009658f5c97f5629094c0c2",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\next.config.ts": {
+    "mtime": 1779259489.9047215,
+    "ast_hash": "7d8cd3ac4331585b2d46584725a41c17",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\package.json": {
+    "mtime": 1779259489.9067218,
+    "ast_hash": "57b90c10db031a94ad6483058791d2ac",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\tsconfig.json": {
+    "mtime": 1779259489.9806805,
+    "ast_hash": "0a2f4ed9289b65cd3feb4fb4ab3a4fcd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\.claude\\settings.json": {
+    "mtime": 1779259489.9004705,
+    "ast_hash": "a89b07a2d87e10ca80caa315368bc371",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\.claude\\settings.local.json": {
+    "mtime": 1779259489.9004705,
+    "ast_hash": "34cb6f97ffe91e6e3c6cad936f06dca1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\.genesis\\config.json": {
+    "mtime": 1779259489.9014702,
+    "ast_hash": "5bc1dad83eba973fcaf7a5fc51281ed0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\content\\posts\\welcome-to-genesis.json": {
+    "mtime": 1779259489.9037285,
+    "ast_hash": "2de6a875b5220a1f581f45c5ba1a7b9b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\middleware.ts": {
+    "mtime": 1779259489.9806805,
+    "ast_hash": "cc114b3cded6874056edc8abe9049ef1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\layout.tsx": {
+    "mtime": 1779259489.9671607,
+    "ast_hash": "926c058980b53ce9a25e4d1ec9d3926a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\page.tsx": {
+    "mtime": 1779259489.9691598,
+    "ast_hash": "39b15a3dc2674d91297168c5f93bc3ce",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\admin\\page.tsx": {
+    "mtime": 1779259489.9292612,
+    "ast_hash": "eb198f508ea9d161cea780c320fe53b3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\ai-extract\\route.ts": {
+    "mtime": 1779259489.9302504,
+    "ast_hash": "0495c155d6b09d225db5df2dfd77836e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\auth\\login\\route.ts": {
+    "mtime": 1779259489.9312508,
+    "ast_hash": "bda00ce528363c36d314777e320951fb",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\auth\\logout\\route.ts": {
+    "mtime": 1779259489.9312508,
+    "ast_hash": "18cb230ffe9d81a7f9fe0baa699aa973",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\auth\\me\\route.ts": {
+    "mtime": 1779259489.9327567,
+    "ast_hash": "2cc28d22faedcb7f9f7d864c9dd7f46b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\client\\profile\\route.ts": {
+    "mtime": 1779259489.9337637,
+    "ast_hash": "b646fdd28bd00fb66a0b21a4eb638da9",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\client-projects\\route.ts": {
+    "mtime": 1779259489.9327567,
+    "ast_hash": "498141f23d667f3508d8541d99b32550",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\clients\\route.ts": {
+    "mtime": 1779259489.934771,
+    "ast_hash": "d066e305883c08669863957470f4a368",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\clients\\[clientId]\\route.ts": {
+    "mtime": 1779259489.9337637,
+    "ast_hash": "f3a2d6ef6cf3db7405e780b96cef5fe0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\developers\\route.ts": {
+    "mtime": 1779259489.9357708,
+    "ast_hash": "0558bc9e373fd4082a7136c160ace503",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\developers\\[developerId]\\route.ts": {
+    "mtime": 1779259489.934771,
+    "ast_hash": "a8ed3f71fdd293cc327ea052b9b51d27",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\expenses\\route.ts": {
+    "mtime": 1779259489.936771,
+    "ast_hash": "65d82134c0fcb95096990a761b5257c3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\expenses\\[id]\\route.ts": {
+    "mtime": 1779259489.9357708,
+    "ast_hash": "fa166bdbb32210bd73cb22e1024cf62d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\financials\\auto\\route.ts": {
+    "mtime": 1779259489.937771,
+    "ast_hash": "72320591e6b436fbca11c2c2d8cb5d3b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\financials\\documents\\route.ts": {
+    "mtime": 1779259489.937771,
+    "ast_hash": "12d1df5b8f27d2c583b4b145264fed54",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\financials\\projects\\route.ts": {
+    "mtime": 1779259489.9387708,
+    "ast_hash": "7a3edc66390d2002e4f1b654dc9ce8a5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\financials\\projects\\[id]\\route.ts": {
+    "mtime": 1779259489.9387708,
+    "ast_hash": "c9fb19a409f86e16c278cc88caff355e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\financials\\yearly\\route.ts": {
+    "mtime": 1779259489.9397264,
+    "ast_hash": "2cbb1edcbeddefae46f373bdf16e1ba8",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\invoice-token\\route.ts": {
+    "mtime": 1779259489.9407332,
+    "ast_hash": "8b7a43431e90afc3970d29610d5f328b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\invoice-token\\[token]\\route.ts": {
+    "mtime": 1779259489.9397264,
+    "ast_hash": "9b4d6f4314e3205ccf03364ff5b9d897",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\migrate\\pdfs\\route.ts": {
+    "mtime": 1779259489.9417803,
+    "ast_hash": "4987b565c9db7d87bdc03a3fcd789a9f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\onboarding\\route.ts": {
+    "mtime": 1779259489.9427874,
+    "ast_hash": "223913a84c151a0ea013d98ebb7410dd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\route.ts": {
+    "mtime": 1779259489.9490097,
+    "ast_hash": "0f3dcc4bb90a24faacf8033ae2a3364c",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\route.ts": {
+    "mtime": 1779259489.9468355,
+    "ast_hash": "a2c6d1ac17441c7f9fc681ad91ab2749",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\assign-client\\route.ts": {
+    "mtime": 1779259489.943694,
+    "ast_hash": "14415ad3eee6555d2b398ed26477ec30",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\documents\\route.ts": {
+    "mtime": 1779259489.943694,
+    "ast_hash": "57670de09ffc9eb9d5d64bb4b1ef2c7c",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\invoices\\route.ts": {
+    "mtime": 1779259489.9452553,
+    "ast_hash": "7e701e6318976b2941493e185abae53f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\payments\\route.ts": {
+    "mtime": 1779259489.9463093,
+    "ast_hash": "a78ec2818a5b024b240e54fa7a61be7d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\pdfs\\route.ts": {
+    "mtime": 1779259489.9468355,
+    "ast_hash": "29f0ca1d3c7452646933d9c3266c5a1d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\projects\\[id]\\status\\route.ts": {
+    "mtime": 1779259489.9483955,
+    "ast_hash": "4169ef305337e7e1a95a6e84e5437fcf",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\send-invoice\\route.ts": {
+    "mtime": 1779259489.949529,
+    "ast_hash": "2e6bf458361634e4f24c7d38930cea76",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\send-receipt\\route.ts": {
+    "mtime": 1779259489.949529,
+    "ast_hash": "d0c7d3d80d8bdd21548033746317fe93",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\send-scope-of-work\\route.ts": {
+    "mtime": 1779259489.9505358,
+    "ast_hash": "f0a09f217ae2ea944a3a374f95de6cd7",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\sow-documents\\route.ts": {
+    "mtime": 1779259489.9505358,
+    "ast_hash": "74d27bb93e7cadb889fee89167a5d69c",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\sow-submit-signature\\route.ts": {
+    "mtime": 1779259489.9515367,
+    "ast_hash": "32b0419c7e4741e3f0cc34f771ea6319",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\sow-token\\demo-store\\route.ts": {
+    "mtime": 1779259489.952536,
+    "ast_hash": "04be5a8ea1d75dc4165274b830ee97db",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\sow-token\\[token]\\route.ts": {
+    "mtime": 1779259489.952536,
+    "ast_hash": "84f2ac902c72389255534c2f893174a3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\tenant-info\\route.ts": {
+    "mtime": 1779259489.9536326,
+    "ast_hash": "9873c2a2f269dfe60ed153d6fec66c41",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\api\\tenants\\route.ts": {
+    "mtime": 1779259489.9546359,
+    "ast_hash": "5506b01605c15fb0158beac19a0b1a88",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\client\\page.tsx": {
+    "mtime": 1779259489.9556427,
+    "ast_hash": "b84c101ecc21c0f303a9c892c4166181",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\client\\profile\\page.tsx": {
+    "mtime": 1779259489.9566426,
+    "ast_hash": "f60bdf7820f9a1e340d78edfc3d7d8cd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\clients\\page.tsx": {
+    "mtime": 1779259489.9576416,
+    "ast_hash": "51592a402ccd3ebc132dea1a70d78ca2",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\clients\\[clientId]\\page.tsx": {
+    "mtime": 1779259489.9576416,
+    "ast_hash": "9199484b1f98f75a89a6ff429d430c4b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\create\\page.tsx": {
+    "mtime": 1779259489.9586427,
+    "ast_hash": "3cc42e016422f8a3c34b1a9e1925e20b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\developers\\page.tsx": {
+    "mtime": 1779259489.9606428,
+    "ast_hash": "622534db832a2960dc1ed082c2c6fac6",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\developers\\[developerId]\\page.tsx": {
+    "mtime": 1779259489.9596436,
+    "ast_hash": "a14a688770f570ef2e1ef6f06fa36472",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\financials\\page.tsx": {
+    "mtime": 1779259489.9616425,
+    "ast_hash": "faadebbe5c6600b24021c9c40a2b0682",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\invoice\\[token]\\page.tsx": {
+    "mtime": 1779259489.9671607,
+    "ast_hash": "acfe26aa7f34c035b6cc17b85eb91cf5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\login\\page.tsx": {
+    "mtime": 1779259489.9681602,
+    "ast_hash": "3e265fd7f0b9f3590e9aa3ebbf81fcf0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\project\\[id]\\page.tsx": {
+    "mtime": 1779259489.9701614,
+    "ast_hash": "ff7dad9bd2391aa80d54d24cd6202b08",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\receipt\\[token]\\page.tsx": {
+    "mtime": 1779259489.9711611,
+    "ast_hash": "a91ebb807dd2dbacaf87f507c03c1de5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\sow\\view\\[token]\\page.tsx": {
+    "mtime": 1779259489.9711611,
+    "ast_hash": "e20be6dac324a44e5be44bee991fe823",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\unassigned\\page.tsx": {
+    "mtime": 1779259489.9726672,
+    "ast_hash": "743effedfad9423f7da6c04bd1741b43",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\components\\InvoiceForm.tsx": {
+    "mtime": 1779259489.9756806,
+    "ast_hash": "7238a6dbb627078da40ae834a2b2b064",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\components\\InvoiceRenderer.tsx": {
+    "mtime": 1779259489.976695,
+    "ast_hash": "ad88dae4138b2372b345a240ff481931",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\components\\ReceiptRenderer.tsx": {
+    "mtime": 1779259489.976695,
+    "ast_hash": "6f95c9d528759ecd5fbb4c34a855b050",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\components\\Sidebar.tsx": {
+    "mtime": 1779259489.9776824,
+    "ast_hash": "28977b8a1a96aef9f9fc2b8465f3f5e5",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\auth.ts": {
+    "mtime": 1779259489.9776824,
+    "ast_hash": "81dc15c0f32c0dc08bf069064b6926cd",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\db.ts": {
+    "mtime": 1779259489.9786832,
+    "ast_hash": "1d23460fcf8ea481dccdc66fdfd0ea59",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\demo-data.ts": {
+    "mtime": 1779259489.9786832,
+    "ast_hash": "0aa585ced066214ba5484206f6055ebe",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\encryption.ts": {
+    "mtime": 1779259489.9786832,
+    "ast_hash": "c590d47f02a9dee12473517484ed4090",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\keyStore.ts": {
+    "mtime": 1779259489.9796827,
+    "ast_hash": "1ffaa1a79667994f0622e28e910b9733",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\sow-storage.ts": {
+    "mtime": 1779259489.9796827,
+    "ast_hash": "d6b6fd7313b01bbd23b85ade9abb3030",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\lib\\sowStorage.ts": {
+    "mtime": 1779259489.9806805,
+    "ast_hash": "698a8ecad7e830ab11529e9d26eafb71",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\.genesis\\config.json": {
+    "mtime": 1779263022.4494133,
+    "ast_hash": "5bc1dad83eba973fcaf7a5fc51281ed0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\.vscode\\settings.json": {
+    "mtime": 1779263022.450413,
+    "ast_hash": "0bf2015d3cffb6caffc82b569857d887",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\content\\posts\\welcome-to-genesis.json": {
+    "mtime": 1779263022.4525242,
+    "ast_hash": "2de6a875b5220a1f581f45c5ba1a7b9b",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\scripts\\seed.ts": {
+    "mtime": 1778298528.8220336,
+    "ast_hash": "81009358d93326cc815c06926608cb20",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\demo.html": {
+    "mtime": 1778741219.4357235,
+    "ast_hash": "2ad91d0462b155c0df80d2d1b3076172",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\README.md": {
+    "mtime": 1778244954.633427,
+    "ast_hash": "f15aaa42d5d299d091b1171097ea56ad",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\FindUrProperty.html": {
+    "mtime": 1779165924.2416017,
+    "ast_hash": "1a771e43860bb062df7b4853d2e1999e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\index.html": {
+    "mtime": 1779165924.2446985,
+    "ast_hash": "0f3e246b518fd186d17f14c4dd6f71b1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\linecheck.txt": {
+    "mtime": 1779165924.2512317,
+    "ast_hash": "ce1147bed7f706bba4bec28eab5f258a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\FindUrProperty\\README.md": {
+    "mtime": 1779165924.2416017,
+    "ast_hash": "d0295cb19a2b3c3ab4f9617cc98d181f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\FindUrProperty.html": {
+    "mtime": 1779248888.922237,
+    "ast_hash": "1a771e43860bb062df7b4853d2e1999e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\index.html": {
+    "mtime": 1779248888.926132,
+    "ast_hash": "0f3e246b518fd186d17f14c4dd6f71b1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\linecheck.txt": {
+    "mtime": 1779248888.9351342,
+    "ast_hash": "ce1147bed7f706bba4bec28eab5f258a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\N0teveryth1ng-FindUrProperty\\README.md": {
+    "mtime": 1779248888.9232335,
+    "ast_hash": "d0295cb19a2b3c3ab4f9617cc98d181f",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\README.md": {
+    "mtime": 1779259489.9024694,
+    "ast_hash": "9162add00befbcdb432430f405c4ad8d",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\contact.html": {
+    "mtime": 1779263022.4525242,
+    "ast_hash": "6d1ab67c30d11594d9b356e540c90c0a",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\index.html": {
+    "mtime": 1779263022.4535344,
+    "ast_hash": "8218b9424c9760c0b0c0f794f6cbf674",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\case-studies\\index.html": {
+    "mtime": 1779263022.451427,
+    "ast_hash": "c1b3c03ea1952c25a23e247675821fa9",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\services\\accounting\\bookkeeping-general.html": {
+    "mtime": 1779263022.4545324,
+    "ast_hash": "af13b5ac31ebda899d6c0b079f407ef0",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\services\\audit\\financial-audit.html": {
+    "mtime": 1779263022.4555316,
+    "ast_hash": "059e25f5cd43216c601f2415b54063fa",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-fynexglobal-\\services\\tax\\form-1040-prep.html": {
+    "mtime": 1779263022.4555316,
+    "ast_hash": "9bd352a024518bec2f912e8b22a164ae",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\file.svg": {
+    "mtime": 1778244954.6604278,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\globe.svg": {
+    "mtime": 1778244954.666427,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\next.svg": {
+    "mtime": 1778244954.6714263,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\vercel.svg": {
+    "mtime": 1778244954.6764266,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\window.svg": {
+    "mtime": 1778244954.6794271,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\uploads\\1778599401272-39pv1302pkj.jpg": {
+    "mtime": 1778599401.276497,
+    "ast_hash": "55b2c44e84329f7eb38aab2e2c64d426",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\public\\uploads\\1778599417429-ygzoi7tsasn.jpg": {
+    "mtime": 1778599417.4318078,
+    "ast_hash": "a8854cd40f31732d42907e8a114757c1",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\public\\founder-signature.png": {
+    "mtime": 1779259489.9077225,
+    "ast_hash": "7eba75d25e170e1e8b23f814b82dab36",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\public\\founder.webp": {
+    "mtime": 1779259489.9232378,
+    "ast_hash": "151eabb311ee3260d2fdef6bd3f358e7",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\public\\logo.png": {
+    "mtime": 1779259489.9262471,
+    "ast_hash": "7f5101c24d48fcb65c4f4eb2f0572bca",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\public\\logo3.png": {
+    "mtime": 1779259489.9282472,
+    "ast_hash": "ee00048f3a9ace4657aeee0694727623",
+    "semantic_hash": ""
+  },
+  "D:\\genesis_CMS\\genesis-cms\\sandbox\\RohanPrajapati2610-CRM\\src\\app\\icon.png": {
+    "mtime": 1779259489.9662642,
+    "ast_hash": "7f5101c24d48fcb65c4f4eb2f0572bca",
+    "semantic_hash": ""
+  }
+}

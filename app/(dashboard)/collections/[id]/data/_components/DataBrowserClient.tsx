@@ -10,7 +10,8 @@ import {
   ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown, X,
 } from "lucide-react";
 import Link from "next/link";
-import { deleteRecord, getRecords, type SortClause } from "@/lib/actions/collections";
+import { deleteRecord, getRecords } from "@/lib/actions/collections";
+import type { SortClause } from "@/lib/db-dynamic";
 import { deleteGitRecord, getGitRecords } from "@/lib/actions/git";
 import RecordFormModal from "./RecordFormModal";
 import type { Collection, Field, Record as PrismaRecord } from "@prisma/client";

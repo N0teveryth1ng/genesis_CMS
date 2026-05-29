@@ -21,7 +21,6 @@ import {
   type SortClause,
 } from "@/lib/db-dynamic";
 
-export type { FilterClause, SortClause };
 
 /* ── Collections ─────────────────────────────────────────── */
 
