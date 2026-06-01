@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPageBySlug } from "@/lib/actions/pages";
+import { getNavMenuById } from "@/lib/actions/navigation";
 import type { Block, BlockStyle } from "@/app/(dashboard)/pages/_components/PageEditor";
 import { FormBlock } from "@/app/site/_components/FormBlock";
 
@@ -54,14 +55,28 @@ function pad(s: BlockStyle | undefined, def: string) {
 }
 
 /* ── Block renderers ─────────────────────────────────────── */
-function NavbarBlock({ data }: { data: Record<string, string> }) {
-  const links = (data.links ?? "").split(",").map((l) => l.trim()).filter(Boolean);
+async function NavbarBlock({ data, style }: { data: Record<string, string>; style?: BlockStyle }) {
+  type NavItem = { id: string; label: string; href: string };
+  let navItems: NavItem[] = [];
+
+  if (data.menuId) {
+    const menu = await getNavMenuById(data.menuId);
+    if (menu) {
+      try { navItems = JSON.parse(menu.items) as NavItem[]; } catch { /* empty */ }
+    }
+  } else {
+    navItems = (data.links ?? "").split(",").map((l, i) => ({ id: String(i), label: l.trim(), href: "#" })).filter((item) => item.label);
+  }
+
+  const navBg    = style?.bg    ?? data.bg    ?? "#ffffff";
+  const navColor = style?.color ?? data.color ?? "#111827";
+
   return (
-    <nav style={{ background: data.bg ?? "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-      <span style={{ fontWeight: 800, fontSize: "1.125rem", color: "#111827" }}>{data.logo || "Brand"}</span>
+    <nav style={{ background: navBg, borderBottom: "1px solid #e5e7eb", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+      <span style={{ fontWeight: 800, fontSize: "1.125rem", color: navColor }}>{data.logo || "Brand"}</span>
       <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-        {links.map((l) => (
-          <a key={l} href="#" style={{ fontSize: "0.9rem", color: "#374151", textDecoration: "none", fontWeight: 500 }}>{l}</a>
+        {navItems.map((item) => (
+          <a key={item.id} href={item.href} style={{ fontSize: "0.9rem", color: navColor, textDecoration: "none", fontWeight: 500, opacity: 0.85 }}>{item.label}</a>
         ))}
         {data.cta && (
           <a href={data.ctaUrl ?? "#"} style={{ background: "#0ea5e9", color: "#fff", padding: "8px 20px", borderRadius: 8, fontWeight: 600, fontSize: "0.875rem", textDecoration: "none" }}>{data.cta}</a>
@@ -238,7 +253,7 @@ function RenderBlock({ block, page }: { block: Block; page: { id: string; slug: 
 
   const inner = (() => {
     switch (block.type) {
-      case "navbar":      return <NavbarBlock      data={block.data} />;
+      case "navbar":      return <NavbarBlock      data={block.data} style={block.style} />;
       case "hero":        return <HeroBlock        data={block.data} style={block.style} />;
       case "features":    return <FeaturesBlock    data={block.data} style={block.style} />;
       case "testimonial": return <TestimonialBlock data={block.data} style={block.style} />;

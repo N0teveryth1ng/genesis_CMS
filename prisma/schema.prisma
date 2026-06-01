@@ -195,6 +195,14 @@ model FlowRun {
   endedAt   DateTime?
 }
 
+model NavMenu {
+  id        String   @id @default(cuid())
+  name      String
+  items     String   @default("[]") // JSON: [{id, label, href}]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model FormSubmission {
   id        String   @id @default(cuid())
   pageId    String

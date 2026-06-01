@@ -7,11 +7,14 @@ import {
   Loader2, ChevronDown, ChevronUp, Type, AlignLeft, Image,
   Minus, Columns2, ExternalLink, Check, Navigation, LayoutGrid,
   MessageSquare, Footprints, Mail, Sliders, FormInput,
-  Share2, LayoutTemplate, X, Copy,
+  Share2, LayoutTemplate, X, Copy, Link2,
 } from "lucide-react";
 import { updatePageBlocks, updatePageStatus, updatePageMeta } from "@/lib/actions/pages";
 import { TEMPLATES } from "@/lib/templates";
 import type { Page } from "@prisma/client";
+
+type PublishedPage = { id: string; title: string; slug: string };
+type NavMenu       = { id: string; name: string };
 
 /* ── Block types ─────────────────────────────────────────── */
 export type BlockType =
@@ -37,23 +40,21 @@ export interface Block {
 
 /* ── Block definitions ───────────────────────────────────── */
 const BLOCK_DEFS: { type: BlockType; label: string; icon: React.ElementType; defaults: Record<string, string> }[] = [
-  { type: "navbar",      label: "Navbar",      icon: Navigation,  defaults: { logo: "My Brand", links: "Home,About,Contact", cta: "Get Started", ctaUrl: "#" } },
-  { type: "hero",        label: "Hero",        icon: Type,        defaults: { heading: "Welcome to our site", subheading: "A short description of what you do.", ctaLabel: "Get Started", ctaUrl: "#", align: "center" } },
-  { type: "features",    label: "Features",    icon: LayoutGrid,  defaults: { heading: "Why choose us", f1title: "Fast", f1desc: "Built for speed", f2title: "Reliable", f2desc: "Always available", f3title: "Secure", f3desc: "Your data is safe" } },
+  { type: "navbar",      label: "Navbar",      icon: Navigation,    defaults: { logo: "My Brand", links: "Home,About,Contact", cta: "Get Started", ctaUrl: "#" } },
+  { type: "hero",        label: "Hero",        icon: Type,          defaults: { heading: "Welcome to our site", subheading: "A short description of what you do.", ctaLabel: "Get Started", ctaUrl: "#", align: "center" } },
+  { type: "features",    label: "Features",    icon: LayoutGrid,    defaults: { heading: "Why choose us", f1title: "Fast", f1desc: "Built for speed", f2title: "Reliable", f2desc: "Always available", f3title: "Secure", f3desc: "Your data is safe" } },
   { type: "testimonial", label: "Testimonial", icon: MessageSquare, defaults: { quote: "This product changed how we work.", author: "Jane Doe", role: "CEO, Acme Inc" } },
-  { type: "text",        label: "Text Block",  icon: AlignLeft,   defaults: { content: "Add your text here..." } },
-  { type: "image",       label: "Image",       icon: Image,       defaults: { url: "", alt: "", caption: "" } },
-  { type: "button",      label: "Button",      icon: ExternalLink, defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
-  { type: "contact",     label: "Contact",     icon: Mail,        defaults: { heading: "Get in touch", email: "hello@example.com", phone: "", address: "" } },
-  { type: "form",        label: "Form",        icon: FormInput,   defaults: { heading: "Contact Us", submitLabel: "Send Message", successMsg: "Thanks! We'll be in touch.", fields: JSON.stringify([{ id: "f1", label: "Name", type: "text", required: true }, { id: "f2", label: "Email", type: "email", required: true }, { id: "f3", label: "Message", type: "textarea", required: true }]) } },
-  { type: "columns",     label: "Columns",     icon: Columns2,    defaults: { left: "Left column content", right: "Right column content" } },
-  { type: "footer",      label: "Footer",      icon: Footprints,  defaults: { logo: "My Brand", links: "Home,About,Contact,Privacy", copy: `© ${new Date().getFullYear()} My Brand. All rights reserved.` } },
-  { type: "divider",     label: "Divider",     icon: Minus,       defaults: {} },
+  { type: "text",        label: "Text Block",  icon: AlignLeft,     defaults: { content: "Add your text here..." } },
+  { type: "image",       label: "Image",       icon: Image,         defaults: { url: "", alt: "", caption: "" } },
+  { type: "button",      label: "Button",      icon: ExternalLink,  defaults: { label: "Click here", url: "#", align: "center", variant: "primary" } },
+  { type: "contact",     label: "Contact",     icon: Mail,          defaults: { heading: "Get in touch", email: "hello@example.com", phone: "", address: "" } },
+  { type: "form",        label: "Form",        icon: FormInput,     defaults: { heading: "Contact Us", submitLabel: "Send Message", successMsg: "Thanks! We'll be in touch.", fields: JSON.stringify([{ id: "f1", label: "Name", type: "text", required: true }, { id: "f2", label: "Email", type: "email", required: true }, { id: "f3", label: "Message", type: "textarea", required: true }]) } },
+  { type: "columns",     label: "Columns",     icon: Columns2,      defaults: { left: "Left column content", right: "Right column content" } },
+  { type: "footer",      label: "Footer",      icon: Footprints,    defaults: { logo: "My Brand", links: "Home,About,Contact,Privacy", copy: `© ${new Date().getFullYear()} My Brand. All rights reserved.` } },
+  { type: "divider",     label: "Divider",     icon: Minus,         defaults: {} },
 ];
 
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
+function uid() { return Math.random().toString(36).slice(2, 10); }
 
 /* ── Shared field components ─────────────────────────────── */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -87,11 +88,58 @@ function Textarea({ value, onChange, placeholder, rows = 4 }: { value: string; o
   );
 }
 
+/* ── URL field with page picker ──────────────────────────── */
+function UrlField({ label, value, onChange, pages }: {
+  label:    string;
+  value:    string;
+  onChange: (v: string) => void;
+  pages:    PublishedPage[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Field label={label}>
+      <div className="flex flex-col gap-1">
+        <div className="relative">
+          <Input value={value} onChange={onChange} placeholder="https://... or #anchor" />
+        </div>
+        {pages.length > 0 && (
+          <div className="relative">
+            <button onClick={() => setOpen((v) => !v)}
+              className="flex items-center gap-1 text-[10px] font-medium"
+              style={{ color: "var(--primary)" }}>
+              <Link2 size={9} /> Link to a page
+            </button>
+            {open && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+                <div className="absolute left-0 z-20 mt-1 rounded-xl shadow-xl overflow-hidden w-64"
+                  style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+                  {pages.map((p) => (
+                    <button key={p.id}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm text-left"
+                      style={{ color: "var(--text-soft)" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--bg-overlay)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                      onClick={() => { onChange(`/site/${p.slug}`); setOpen(false); }}>
+                      <span className="truncate">{p.title}</span>
+                      <span className="text-[10px] shrink-0 ml-2" style={{ color: "var(--text-muted)" }}>/{p.slug}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </Field>
+  );
+}
+
 /* ── Style panel ─────────────────────────────────────────── */
 function ChipGroup({ options, value, onChange }: {
   options: { val: string; label: string }[];
-  value?: string;
-  onChange: (v: string) => void;
+  value?:  string;
+  onChange:(v: string) => void;
 }) {
   return (
     <div className="flex gap-1 flex-wrap">
@@ -169,43 +217,25 @@ function StylePanel({ style, onChange }: { style: BlockStyle; onChange: (s: Bloc
 }
 
 /* ── Form field builder ──────────────────────────────────── */
-interface FormFieldDef {
-  id:       string;
-  label:    string;
-  type:     string;
-  required: boolean;
-}
+interface FormFieldDef { id: string; label: string; type: string; required: boolean }
 
 function FormFieldBuilder({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [fields, setFields] = useState<FormFieldDef[]>(() => {
     try { return JSON.parse(value || "[]"); } catch { return []; }
   });
-
-  function update(next: FormFieldDef[]) {
-    setFields(next);
-    onChange(JSON.stringify(next));
-  }
-
-  function addField() {
-    update([...fields, { id: uid(), label: "New Field", type: "text", required: false }]);
-  }
-
+  function update(next: FormFieldDef[]) { setFields(next); onChange(JSON.stringify(next)); }
+  function addField() { update([...fields, { id: uid(), label: "New Field", type: "text", required: false }]); }
   return (
     <div className="flex flex-col gap-2">
       {fields.map((f, i) => (
         <div key={f.id} className="flex items-center gap-2 p-2 rounded-lg"
           style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
-          <div className="flex-1 min-w-0">
-            <input
-              value={f.label}
-              onChange={(e) => update(fields.map((ff, j) => j === i ? { ...ff, label: e.target.value } : ff))}
-              className="w-full text-xs rounded px-2 py-1 outline-none"
-              style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}
-              placeholder="Field label"
-            />
-          </div>
-          <select
-            value={f.type}
+          <input value={f.label}
+            onChange={(e) => update(fields.map((ff, j) => j === i ? { ...ff, label: e.target.value } : ff))}
+            className="flex-1 min-w-0 text-xs rounded px-2 py-1 outline-none"
+            style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}
+            placeholder="Label" />
+          <select value={f.type}
             onChange={(e) => update(fields.map((ff, j) => j === i ? { ...ff, type: e.target.value } : ff))}
             className="text-xs rounded px-2 py-1 outline-none shrink-0"
             style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}>
@@ -220,8 +250,7 @@ function FormFieldBuilder({ value, onChange }: { value: string; onChange: (v: st
               onChange={(e) => update(fields.map((ff, j) => j === i ? { ...ff, required: e.target.checked } : ff))} />
             Req
           </label>
-          <button onClick={() => update(fields.filter((_, j) => j !== i))}
-            className="shrink-0" style={{ color: "var(--danger)" }}>
+          <button onClick={() => update(fields.filter((_, j) => j !== i))} style={{ color: "var(--danger)" }}>
             <X size={12} />
           </button>
         </div>
@@ -236,8 +265,13 @@ function FormFieldBuilder({ value, onChange }: { value: string; onChange: (v: st
 }
 
 /* ── Block content fields ────────────────────────────────── */
-function BlockFields({ block, onChange }: { block: Block; onChange: (data: Record<string, string>) => void }) {
-  const d = block.data;
+function BlockFields({ block, onChange, pages, menus }: {
+  block:    Block;
+  onChange: (data: Record<string, string>) => void;
+  pages:    PublishedPage[];
+  menus:    NavMenu[];
+}) {
+  const d   = block.data;
   const set = (key: string, val: string) => onChange({ ...d, [key]: val });
 
   switch (block.type) {
@@ -245,9 +279,23 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
       return (
         <>
           <Field label="Brand / Logo Text"><Input value={d.logo ?? ""} onChange={(v) => set("logo", v)} placeholder="My Brand" /></Field>
-          <Field label="Nav Links (comma separated)"><Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Services,Contact" /></Field>
+          {menus.length > 0 && (
+            <Field label="Navigation Menu">
+              <select value={d.menuId ?? ""} onChange={(e) => set("menuId", e.target.value)}
+                className="rounded-lg px-3 py-2 text-sm outline-none"
+                style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}>
+                <option value="">Use links field below</option>
+                {menus.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+              </select>
+            </Field>
+          )}
+          {!d.menuId && (
+            <Field label="Nav Links (comma separated)">
+              <Input value={d.links ?? ""} onChange={(v) => set("links", v)} placeholder="Home,About,Services,Contact" />
+            </Field>
+          )}
           <Field label="CTA Button Label"><Input value={d.cta ?? ""} onChange={(v) => set("cta", v)} placeholder="Get Started" /></Field>
-          <Field label="CTA Button URL"><Input value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} placeholder="#" /></Field>
+          <UrlField label="CTA Button URL" value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} pages={pages} />
         </>
       );
     case "hero":
@@ -256,7 +304,7 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
           <Field label="Heading"><Input value={d.heading ?? ""} onChange={(v) => set("heading", v)} placeholder="Main heading" /></Field>
           <Field label="Subheading"><Textarea value={d.subheading ?? ""} onChange={(v) => set("subheading", v)} placeholder="Subtitle text" rows={2} /></Field>
           <Field label="CTA Button Label"><Input value={d.ctaLabel ?? ""} onChange={(v) => set("ctaLabel", v)} placeholder="Get Started" /></Field>
-          <Field label="CTA Button URL"><Input value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} placeholder="#" /></Field>
+          <UrlField label="CTA Button URL" value={d.ctaUrl ?? ""} onChange={(v) => set("ctaUrl", v)} pages={pages} />
           <Field label="Alignment">
             <select value={d.align ?? "center"} onChange={(e) => set("align", e.target.value)}
               className="rounded-lg px-3 py-2 text-sm outline-none"
@@ -322,7 +370,7 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
     case "image":
       return (
         <>
-          <Field label="Image URL"><Input value={d.url ?? ""} onChange={(v) => set("url", v)} placeholder="https://..." /></Field>
+          <UrlField label="Image URL" value={d.url ?? ""} onChange={(v) => set("url", v)} pages={[]} />
           <Field label="Alt Text"><Input value={d.alt ?? ""} onChange={(v) => set("alt", v)} /></Field>
           <Field label="Caption"><Input value={d.caption ?? ""} onChange={(v) => set("caption", v)} /></Field>
         </>
@@ -331,23 +379,19 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
       return (
         <>
           <Field label="Label"><Input value={d.label ?? ""} onChange={(v) => set("label", v)} placeholder="Click here" /></Field>
-          <Field label="URL"><Input value={d.url ?? ""} onChange={(v) => set("url", v)} placeholder="https://..." /></Field>
+          <UrlField label="URL" value={d.url ?? ""} onChange={(v) => set("url", v)} pages={pages} />
           <Field label="Alignment">
             <select value={d.align ?? "center"} onChange={(e) => set("align", e.target.value)}
               className="rounded-lg px-3 py-2 text-sm outline-none"
               style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}>
-              <option value="left">Left</option>
-              <option value="center">Center</option>
-              <option value="right">Right</option>
+              <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
             </select>
           </Field>
           <Field label="Style">
             <select value={d.variant ?? "primary"} onChange={(e) => set("variant", e.target.value)}
               className="rounded-lg px-3 py-2 text-sm outline-none"
               style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text)" }}>
-              <option value="primary">Primary</option>
-              <option value="outline">Outline</option>
-              <option value="ghost">Ghost</option>
+              <option value="primary">Primary</option><option value="outline">Outline</option><option value="ghost">Ghost</option>
             </select>
           </Field>
         </>
@@ -365,42 +409,30 @@ function BlockFields({ block, onChange }: { block: Block; onChange: (data: Recor
 }
 
 /* ── Templates modal ─────────────────────────────────────── */
-function TemplatesModal({ onApply, onClose }: {
-  onApply: (blocks: Block[]) => void;
-  onClose: () => void;
-}) {
+function TemplatesModal({ onApply, onClose }: { onApply: (blocks: Block[]) => void; onClose: () => void }) {
   const [selected, setSelected] = useState<string | null>(null);
-
   function apply() {
     const tpl = TEMPLATES.find((t) => t.id === selected);
     if (!tpl) return;
-    const blocks: Block[] = tpl.blocks.map((b) => ({ ...b, id: uid() }));
-    onApply(blocks);
+    onApply(tpl.blocks.map((b) => ({ ...b, id: uid() })));
     onClose();
   }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
       <div className="w-full max-w-2xl rounded-2xl flex flex-col max-h-[80vh]"
         style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}>
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 shrink-0"
           style={{ borderBottom: "1px solid var(--border)" }}>
           <div>
             <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Page Templates</h2>
-            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-              Start from a pre-built layout. This will replace your current blocks.
-            </p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>Start from a pre-built layout. Replaces current blocks.</p>
           </div>
           <button onClick={onClose} style={{ color: "var(--text-muted)" }}><X size={18} /></button>
         </div>
-
-        {/* Grid */}
         <div className="overflow-y-auto flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {TEMPLATES.map((tpl) => (
-            <button key={tpl.id}
-              onClick={() => setSelected(tpl.id === selected ? null : tpl.id)}
+            <button key={tpl.id} onClick={() => setSelected(tpl.id === selected ? null : tpl.id)}
               className="text-left p-4 rounded-xl transition-all"
               style={{
                 border:     `2px solid ${selected === tpl.id ? "var(--primary)" : "var(--border)"}`,
@@ -420,8 +452,6 @@ function TemplatesModal({ onApply, onClose }: {
             </button>
           ))}
         </div>
-
-        {/* Footer */}
         <div className="px-6 py-4 flex justify-end gap-2 shrink-0"
           style={{ borderTop: "1px solid var(--border)" }}>
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm"
@@ -439,28 +469,22 @@ function TemplatesModal({ onApply, onClose }: {
 
 /* ── Share / SEO modal ───────────────────────────────────── */
 function ShareModal({ page, onClose }: { page: Page; onClose: () => void }) {
-  const [seoTitle,  setSeoTitle]  = useState(page.seoTitle ?? "");
-  const [seoDesc,   setSeoDesc]   = useState((page as Page & { seoDesc?: string }).seoDesc ?? "");
-  const [saving,    setSaving]    = useState(false);
-  const [saved,     setSaved]     = useState(false);
-  const [copied,    setCopied]    = useState(false);
+  const [seoTitle, setSeoTitle] = useState(page.seoTitle ?? "");
+  const [seoDesc,  setSeoDesc]  = useState((page as Page & { seoDesc?: string }).seoDesc ?? "");
+  const [saving,   setSaving]   = useState(false);
+  const [saved,    setSaved]    = useState(false);
+  const [copied,   setCopied]   = useState(false);
 
   const url = typeof window !== "undefined"
     ? `${window.location.origin}/site/${page.slug}`
     : `/site/${page.slug}`;
 
-  function copy() {
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  function copy() { navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); }
 
   async function saveMeta() {
     setSaving(true);
     await updatePageMeta(page.id, { seoTitle, seoDesc });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 2000);
   }
 
   return (
@@ -472,16 +496,12 @@ function ShareModal({ page, onClose }: { page: Page; onClose: () => void }) {
           <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>Share & SEO</h2>
           <button onClick={onClose} style={{ color: "var(--text-muted)" }}><X size={16} /></button>
         </div>
-
-        {/* URL */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium" style={{ color: "var(--text-soft)" }}>
             Public URL
             {page.status !== "published" && (
               <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px]"
-                style={{ background: "var(--bg-overlay)", color: "var(--text-muted)" }}>
-                Draft — not visible
-              </span>
+                style={{ background: "var(--bg-overlay)", color: "var(--text-muted)" }}>Draft</span>
             )}
           </label>
           <div className="flex items-center gap-2">
@@ -497,21 +517,14 @@ function ShareModal({ page, onClose }: { page: Page; onClose: () => void }) {
             </button>
           </div>
         </div>
-
-        {/* SEO */}
         <div className="flex flex-col gap-3">
           <p className="text-xs font-semibold" style={{ color: "var(--text)" }}>SEO Settings</p>
-          <Field label="Meta Title">
-            <Input value={seoTitle} onChange={setSeoTitle} placeholder={page.title} />
-          </Field>
+          <Field label="Meta Title"><Input value={seoTitle} onChange={setSeoTitle} placeholder={page.title} /></Field>
           <Field label="Meta Description">
-            <Textarea value={seoDesc} onChange={setSeoDesc} placeholder="Brief description shown in search results (150–160 chars)…" rows={2} />
+            <Textarea value={seoDesc} onChange={setSeoDesc} placeholder="Brief description for search results…" rows={2} />
           </Field>
-          <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-            {seoDesc.length}/160 characters
-          </p>
+          <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{seoDesc.length}/160 characters</p>
         </div>
-
         <div className="flex gap-2 justify-end">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm"
             style={{ background: "var(--bg-raised)", color: "var(--text-soft)" }}>Close</button>
@@ -531,7 +544,7 @@ function ShareModal({ page, onClose }: { page: Page; onClose: () => void }) {
 function BlockCard({
   block, isDragging, isDragOver,
   onDragStart, onDragOver, onDragEnd, onDrop,
-  onDelete, onChange, onStyleChange,
+  onDelete, onChange, onStyleChange, pages, menus,
 }: {
   block:         Block;
   isDragging:    boolean;
@@ -543,6 +556,8 @@ function BlockCard({
   onDelete:      () => void;
   onChange:      (data: Record<string, string>) => void;
   onStyleChange: (style: BlockStyle) => void;
+  pages:         PublishedPage[];
+  menus:         NavMenu[];
 }) {
   const [open, setOpen] = useState(true);
   const [tab,  setTab]  = useState<"content" | "style">("content");
@@ -564,9 +579,7 @@ function BlockCard({
         opacity:    isDragging ? 0.4 : 1,
         boxShadow:  isDragOver ? "0 0 0 2px var(--primary-dim)" : "none",
         transform:  isDragOver ? "scale(1.01)" : "scale(1)",
-      }}
-    >
-      {/* Header */}
+      }}>
       <div className="flex items-center gap-3 px-4 py-3 select-none"
         style={{ background: "var(--bg-raised)", borderBottom: open ? "1px solid var(--border)" : "none" }}>
         <div className="cursor-grab active:cursor-grabbing p-0.5 rounded"
@@ -577,10 +590,7 @@ function BlockCard({
           <div className="w-6 h-6 rounded-md flex items-center justify-center relative"
             style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
             <Icon size={12} />
-            {hasStyle && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
-                style={{ background: "var(--primary)" }} />
-            )}
+            {hasStyle && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full" style={{ background: "var(--primary)" }} />}
           </div>
           <span className="text-sm font-medium flex-1" style={{ color: "var(--text)" }}>{def.label}</span>
           {open ? <ChevronUp size={13} style={{ color: "var(--text-muted)" }} /> : <ChevronDown size={13} style={{ color: "var(--text-muted)" }} />}
@@ -591,7 +601,6 @@ function BlockCard({
         </button>
       </div>
 
-      {/* Tabs + content */}
       {open && (
         <>
           <div className="flex" style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-raised)" }}>
@@ -601,8 +610,7 @@ function BlockCard({
                 style={{
                   color:        tab === t ? "var(--primary)" : "var(--text-soft)",
                   borderBottom: tab === t ? "2px solid var(--primary)" : "2px solid transparent",
-                  marginBottom: -1,
-                  background:   "transparent",
+                  marginBottom: -1, background: "transparent",
                 }}>
                 {t === "style" && <Sliders size={10} />}
                 {t}
@@ -611,7 +619,7 @@ function BlockCard({
           </div>
           <div className="flex flex-col gap-4 p-4">
             {tab === "content"
-              ? <BlockFields block={block} onChange={onChange} />
+              ? <BlockFields block={block} onChange={onChange} pages={pages} menus={menus} />
               : <StylePanel  style={block.style ?? {}} onChange={onStyleChange} />}
           </div>
         </>
@@ -626,7 +634,7 @@ function AddBlockPicker({ onAdd }: { onAdd: (type: BlockType) => void }) {
   return (
     <div className="relative">
       <button onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all"
+        className="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium"
         style={{ border: "2px dashed var(--border)", color: "var(--text-muted)", background: "transparent" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--primary)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--primary)"; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}>
@@ -659,16 +667,20 @@ function AddBlockPicker({ onAdd }: { onAdd: (type: BlockType) => void }) {
 }
 
 /* ── Main editor ─────────────────────────────────────────── */
-export default function PageEditor({ page }: { page: Page }) {
+export default function PageEditor({ page, pages, menus }: {
+  page:  Page;
+  pages: PublishedPage[];
+  menus: NavMenu[];
+}) {
   const router = useRouter();
-  const [blocks,         setBlocks]         = useState<Block[]>(() => {
+  const [blocks,        setBlocks]        = useState<Block[]>(() => {
     try { return JSON.parse(page.blocks) as Block[]; } catch { return []; }
   });
-  const [status,         setStatus]         = useState(page.status as "draft" | "published");
-  const [saved,          setSaved]          = useState(false);
-  const [showTemplates,  setShowTemplates]  = useState(false);
-  const [showShare,      setShowShare]      = useState(false);
-  const [isPending,      startTransition]   = useTransition();
+  const [status,        setStatus]        = useState(page.status as "draft" | "published");
+  const [saved,         setSaved]         = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [showShare,     setShowShare]     = useState(false);
+  const [isPending,     startTransition]  = useTransition();
 
   const dragIndex  = useRef<number>(-1);
   const [dragOver, setDragOver] = useState<number>(-1);
@@ -677,19 +689,15 @@ export default function PageEditor({ page }: { page: Page }) {
     const def = BLOCK_DEFS.find((d) => d.type === type)!;
     setBlocks((prev) => [...prev, { id: uid(), type, data: { ...def.defaults } }]);
   }
-
   function updateBlock(id: string, data: Record<string, string>) {
     setBlocks((prev) => prev.map((b) => b.id === id ? { ...b, data } : b));
   }
-
   function updateBlockStyle(id: string, style: BlockStyle) {
     setBlocks((prev) => prev.map((b) => b.id === id ? { ...b, style } : b));
   }
-
   function deleteBlock(id: string) {
     setBlocks((prev) => prev.filter((b) => b.id !== id));
   }
-
   function handleDrop(dropIdx: number) {
     const from = dragIndex.current;
     if (from === -1 || from === dropIdx) return;
@@ -699,10 +707,8 @@ export default function PageEditor({ page }: { page: Page }) {
       next.splice(dropIdx, 0, moved);
       return next;
     });
-    dragIndex.current = -1;
-    setDragOver(-1);
+    dragIndex.current = -1; setDragOver(-1);
   }
-
   function save(newStatus?: "draft" | "published") {
     const finalStatus = newStatus ?? status;
     startTransition(async () => {
@@ -736,22 +742,16 @@ export default function PageEditor({ page }: { page: Page }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Templates */}
           <button onClick={() => setShowTemplates(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
-            style={{ background: "var(--bg-overlay)", color: "var(--text-soft)", border: "1px solid var(--border)" }}
-            title="Start from a template">
+            style={{ background: "var(--bg-overlay)", color: "var(--text-soft)", border: "1px solid var(--border)" }}>
             <LayoutTemplate size={12} /> Templates
           </button>
-
-          {/* Share */}
           <button onClick={() => setShowShare(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
             style={{ background: "var(--bg-overlay)", color: "var(--text-soft)", border: "1px solid var(--border)" }}>
             <Share2 size={12} /> Share
           </button>
-
-          {/* Publish / Unpublish */}
           {status === "published" && (
             <a href={`/site/${page.slug}`} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
@@ -765,8 +765,6 @@ export default function PageEditor({ page }: { page: Page }) {
             {status === "published" ? <FileX size={12} /> : <Globe size={12} />}
             {status === "published" ? "Unpublish" : "Publish"}
           </button>
-
-          {/* Save */}
           <button onClick={() => save()} disabled={isPending}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-semibold disabled:opacity-60"
             style={{ background: "var(--primary)", color: "var(--text-inverse)" }}>
@@ -784,13 +782,11 @@ export default function PageEditor({ page }: { page: Page }) {
               style={{ border: "2px dashed var(--border)", color: "var(--text-muted)" }}>
               <LayoutTemplate size={24} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm mb-2">No blocks yet.</p>
-              <button onClick={() => setShowTemplates(true)}
-                className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
+              <button onClick={() => setShowTemplates(true)} className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
                 Start from a template →
               </button>
             </div>
           )}
-
           {blocks.map((block, i) => (
             <BlockCard
               key={block.id}
@@ -804,19 +800,16 @@ export default function PageEditor({ page }: { page: Page }) {
               onDelete={() => deleteBlock(block.id)}
               onChange={(data) => updateBlock(block.id, data)}
               onStyleChange={(style) => updateBlockStyle(block.id, style)}
+              pages={pages}
+              menus={menus}
             />
           ))}
-
           <AddBlockPicker onAdd={addBlock} />
         </div>
       </div>
 
-      {/* Modals */}
       {showTemplates && (
-        <TemplatesModal
-          onApply={(tplBlocks) => setBlocks(tplBlocks)}
-          onClose={() => setShowTemplates(false)}
-        />
+        <TemplatesModal onApply={(b) => setBlocks(b)} onClose={() => setShowTemplates(false)} />
       )}
       {showShare && (
         <ShareModal page={page} onClose={() => setShowShare(false)} />

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Sidebar        from "./Sidebar";
-import Header         from "./Header";
-import CommandPalette from "./CommandPalette";
-import { useUIStore } from "@/lib/stores/ui";
+import Sidebar          from "./Sidebar";
+import Header           from "./Header";
+import CommandPalette   from "./CommandPalette";
+import RealtimeProvider from "@/components/realtime/RealtimeProvider";
+import { useUIStore }   from "@/lib/stores/ui";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const theme = useUIStore((s) => s.theme);
@@ -15,21 +16,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [theme]);
 
   return (
-    <div className="flex h-full min-h-screen overflow-hidden">
-      <Sidebar />
+    <RealtimeProvider>
+      <div className="flex h-full min-h-screen overflow-hidden">
+        <Sidebar />
 
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Header />
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+          <Header />
 
-        <main
-          className="flex-1 overflow-y-auto"
-          style={{ background: "var(--bg-base)" }}
-        >
-          {children}
-        </main>
+          <main
+            className="flex-1 overflow-y-auto"
+            style={{ background: "var(--bg-base)" }}
+          >
+            {children}
+          </main>
+        </div>
+
+        <CommandPalette />
       </div>
-
-      <CommandPalette />
-    </div>
+    </RealtimeProvider>
   );
 }

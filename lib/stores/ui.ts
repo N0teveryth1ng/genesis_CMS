@@ -19,6 +19,10 @@ interface UIStore {
   cmdOpen: boolean;
   openCmd:  () => void;
   closeCmd: () => void;
+
+  /* Real-time connection */
+  liveStatus: "connecting" | "connected" | "disconnected";
+  setLiveStatus: (s: "connecting" | "connected" | "disconnected") => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -43,6 +47,9 @@ export const useUIStore = create<UIStore>()(
       cmdOpen:  false,
       openCmd:  () => set({ cmdOpen: true  }),
       closeCmd: () => set({ cmdOpen: false }),
+
+      liveStatus:    "connecting",
+      setLiveStatus: (s) => set({ liveStatus: s }),
     }),
     {
       name:    "genesis-ui",

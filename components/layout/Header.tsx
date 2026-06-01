@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Search, Bell, ChevronRight, User, LogOut,
   Settings, ChevronsUpDown, Menu, Sun, Moon, Command,
-  Plus, Edit2, Trash2, Database, Users, Globe, FolderOpen, Key,
+  Plus, Edit2, Trash2, Database, Users, Globe, FolderOpen, Key, Wifi, WifiOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
@@ -79,6 +79,27 @@ function SearchBar() {
         <Command size={9} />K
       </span>
     </button>
+  );
+}
+
+/* ── Live indicator ────────────────────────────────────────── */
+function LiveDot() {
+  const status = useUIStore((s) => s.liveStatus);
+  const color  = status === "connected" ? "#22c55e" : status === "connecting" ? "#f59e0b" : "#ef4444";
+  const Icon   = status === "disconnected" ? WifiOff : Wifi;
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg"
+      style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}
+      title={`Real-time: ${status}`}>
+      <span className="relative flex w-2 h-2">
+        {status === "connected" && (
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
+            style={{ background: color }} />
+        )}
+        <span className="relative inline-flex w-2 h-2 rounded-full" style={{ background: color }} />
+      </span>
+      <Icon size={12} style={{ color: "var(--text-muted)" }} className="hidden sm:block" />
+    </div>
   );
 }
 
@@ -382,6 +403,7 @@ export default function Header() {
       {/* Right */}
       <div className="flex items-center gap-2.5">
         <SearchBar />
+        <LiveDot />
         <ThemeToggle />
         <NotificationBell />
         <UserMenu />

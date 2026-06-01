@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
+import { broadcast } from "@/lib/sse";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    broadcast("form_submitted", { pageId, pageSlug, blockId });
     return Response.json({ ok: true });
   } catch (err) {
     console.error("[forms]", err);
