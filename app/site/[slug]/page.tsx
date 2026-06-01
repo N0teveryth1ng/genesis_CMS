@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPageBySlug } from "@/lib/actions/pages";
 import { getNavMenuById } from "@/lib/actions/navigation";
+import { db } from "@/lib/db";
 import type { Block, BlockStyle } from "@/app/(dashboard)/pages/_components/PageEditor";
 import { FormBlock } from "@/app/site/_components/FormBlock";
 
@@ -290,6 +291,9 @@ export default async function SitePage({
   const page = await getPageBySlug(slug);
 
   if (!page || page.status !== "published") notFound();
+
+  // Fire-and-forget page view increment
+  db.page.update({ where: { id: page.id }, data: { pageViews: { increment: 1 } } }).catch(() => {});
 
   let blocks: Block[] = [];
   try { blocks = JSON.parse(page.blocks) as Block[]; } catch { /* empty */ }

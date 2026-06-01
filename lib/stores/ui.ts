@@ -23,6 +23,10 @@ interface UIStore {
   /* Real-time connection */
   liveStatus: "connecting" | "connected" | "disconnected";
   setLiveStatus: (s: "connecting" | "connected" | "disconnected") => void;
+
+  /* Active workspace */
+  activeWorkspaceId: string | null;
+  setActiveWorkspace: (id: string | null) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -50,12 +54,16 @@ export const useUIStore = create<UIStore>()(
 
       liveStatus:    "connecting",
       setLiveStatus: (s) => set({ liveStatus: s }),
+
+      activeWorkspaceId: null,
+      setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
     }),
     {
       name:    "genesis-ui",
       partialize: (s) => ({
-        sidebarCollapsed: s.sidebarCollapsed,
-        theme:            s.theme,
+        sidebarCollapsed:  s.sidebarCollapsed,
+        theme:             s.theme,
+        activeWorkspaceId: s.activeWorkspaceId,
       }),
     }
   )

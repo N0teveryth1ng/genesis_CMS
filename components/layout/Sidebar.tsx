@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   LayoutGrid, Database, FolderOpen, Users, Settings,
   Zap, BarChart2, ChevronLeft, ChevronRight, Globe,
-  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate, PackageOpen, Braces, Puzzle, FormInput, Link2,
+  Shield, Key, HelpCircle, X, ClipboardList, LayoutTemplate, PackageOpen, Braces, Puzzle, FormInput, Link2, Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
+import WorkspaceSwitcher from "./WorkspaceSwitcher";
 
 /* ── Nav data ──────────────────────────────────────────────── */
 const NAV_MAIN = [
@@ -27,12 +28,13 @@ const NAV_MAIN = [
 ];
 
 const NAV_SYSTEM = [
-  { label: "Users",     href: "/users",    icon: Users         },
-  { label: "Roles",     href: "/roles",    icon: Shield        },
-  { label: "API Keys",  href: "/api-keys", icon: Key           },
-  { label: "Webhooks",  href: "/webhooks", icon: Globe         },
-  { label: "Audit Log", href: "/audit",    icon: ClipboardList },
-  { label: "Settings",  href: "/settings", icon: Settings      },
+  { label: "Workspaces", href: "/workspaces", icon: Building2    },
+  { label: "Users",      href: "/users",      icon: Users        },
+  { label: "Roles",      href: "/roles",      icon: Shield       },
+  { label: "API Keys",   href: "/api-keys",   icon: Key          },
+  { label: "Webhooks",   href: "/webhooks",   icon: Globe        },
+  { label: "Audit Log",  href: "/audit",      icon: ClipboardList },
+  { label: "Settings",   href: "/settings",   icon: Settings     },
 ];
 
 /* ── Logo ──────────────────────────────────────────────────── */
@@ -121,12 +123,16 @@ function NavSection({
 }
 
 /* ── Sidebar inner content ──────────────────────────────────── */
+type Workspace = { id: string; name: string; plan: string };
+
 function SidebarContent({
   collapsed,
   onClose,
+  workspaces,
 }: {
   collapsed: boolean;
   onClose?: () => void;
+  workspaces: Workspace[];
 }) {
   const pathname = usePathname();
 
@@ -152,6 +158,9 @@ function SidebarContent({
       {/* Divider */}
       <div className="mx-4 mb-3" style={{ height: "1px", background: "var(--border)" }} />
 
+      {/* Workspace switcher */}
+      {workspaces.length > 0 && <WorkspaceSwitcher workspaces={workspaces} collapsed={collapsed} />}
+
       {/* Nav */}
       <nav className="flex-1 flex flex-col gap-5 px-2 overflow-y-auto pb-4">
         <NavSection title="Content" items={NAV_MAIN}   collapsed={collapsed} pathname={pathname} />
@@ -175,7 +184,7 @@ function SidebarContent({
 }
 
 /* ── Sidebar (desktop + mobile) ─────────────────────────────── */
-export default function Sidebar() {
+export default function Sidebar({ workspaces = [] }: { workspaces?: Workspace[] }) {
   const { sidebarCollapsed, toggleSidebar, sidebarMobileOpen, closeMobileSidebar } = useUIStore();
 
   return (
@@ -185,7 +194,7 @@ export default function Sidebar() {
         className="relative hidden lg:flex flex-col shrink-0 transition-all duration-200"
         style={{ width: sidebarCollapsed ? "64px" : "220px" }}
       >
-        <SidebarContent collapsed={sidebarCollapsed} />
+        <SidebarContent collapsed={sidebarCollapsed} workspaces={workspaces} />
 
         {/* Collapse toggle */}
         <button
@@ -216,7 +225,7 @@ export default function Sidebar() {
           <div
             className="fixed left-0 top-0 bottom-0 z-50 w-55 animate-slide-in lg:hidden"
           >
-            <SidebarContent collapsed={false} onClose={closeMobileSidebar} />
+            <SidebarContent collapsed={false} onClose={closeMobileSidebar} workspaces={workspaces} />
           </div>
         </>
       )}

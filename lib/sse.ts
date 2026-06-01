@@ -1,23 +1,8 @@
-type Controller = ReadableStreamDefaultController<Uint8Array>;
+import { publish } from "./pubsub";
 
-const clients = new Set<Controller>();
-const enc     = new TextEncoder();
-
-export function registerSSEClient(ctrl: Controller) {
-  clients.add(ctrl);
-}
-
-export function unregisterSSEClient(ctrl: Controller) {
-  clients.delete(ctrl);
-}
-
-export function broadcast(event: string, data: unknown) {
-  if (clients.size === 0) return;
-  const msg  = enc.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-  const dead: Controller[] = [];
-  for (const ctrl of clients) {
-    try { ctrl.enqueue(msg); }
-    catch { dead.push(ctrl); }
-  }
-  dead.forEach((c) => clients.delete(c));
+/* broadcast() is now just a thin wrapper around the pubsub layer.
+   Local clients are managed in pubsub.ts; Redis pub/sub replaces the
+   module-level Set when REDIS_URL is set. */
+export async function broadcast(event: string, data: unknown) {
+  await publish(event, data);
 }

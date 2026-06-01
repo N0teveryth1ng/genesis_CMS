@@ -2,9 +2,14 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { getActiveWorkspaceId } from "@/lib/workspace-context";
 
 export async function getNavMenus() {
-  return db.navMenu.findMany({ orderBy: { createdAt: "asc" } });
+  const wsId = await getActiveWorkspaceId();
+  return db.navMenu.findMany({
+    where:   wsId ? { OR: [{ workspaceId: wsId }, { workspaceId: null }] } : undefined,
+    orderBy: { createdAt: "asc" },
+  });
 }
 
 export async function getNavMenuById(id: string) {
@@ -12,7 +17,8 @@ export async function getNavMenuById(id: string) {
 }
 
 export async function createNavMenu(name: string) {
-  const menu = await db.navMenu.create({ data: { name } });
+  const wsId = await getActiveWorkspaceId();
+  const menu = await db.navMenu.create({ data: { name, workspaceId: wsId } });
   revalidatePath("/navigation");
   return menu;
 }

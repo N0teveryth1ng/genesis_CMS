@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join, extname } from "path";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { uploadFile } from "@/lib/storage";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -16,66 +17,48 @@ const ALLOWED_MIME = new Set([
   "audio/mpeg", "audio/wav",
 ]);
 
-const IMAGE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
-const MAX_SIZE = 20 * 1024 * 1024; // 20 MB
+const IMAGE_MIME  = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_SIZE    = 20 * 1024 * 1024;
 const THUMB_WIDTH = 400;
 
 export async function POST(req: NextRequest) {
+  /* Auth check */
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   try {
     const formData = await req.formData();
-    const files = formData.getAll("files") as File[];
-
-    if (!files.length) {
-      return NextResponse.json({ error: "No files provided" }, { status: 400 });
-    }
-
-    const uploadsDir = join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
+    const files    = formData.getAll("files") as File[];
+    if (!files.length) return NextResponse.json({ error: "No files provided" }, { status: 400 });
 
     const saved = [];
 
     for (const file of files) {
-      if (!ALLOWED_MIME.has(file.type)) {
+      if (!ALLOWED_MIME.has(file.type))
         return NextResponse.json({ error: `File type ${file.type} not allowed` }, { status: 400 });
-      }
-      if (file.size > MAX_SIZE) {
+      if (file.size > MAX_SIZE)
         return NextResponse.json({ error: `${file.name} exceeds 20 MB limit` }, { status: 400 });
-      }
 
-      const ext      = extname(file.name) || "";
-      const baseName = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const safeName = `${baseName}${ext}`;
-      const filePath = join(uploadsDir, safeName);
-      const buffer   = Buffer.from(await file.arrayBuffer());
-
-      await writeFile(filePath, buffer);
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const { path, url } = await uploadFile(buffer, file.name, file.type);
 
       let thumbnailUrl: string | null = null;
 
-      /* Generate thumbnail for raster images */
       if (IMAGE_MIME.has(file.type) && file.type !== "image/gif") {
         try {
-          const thumbName = `${baseName}_thumb.webp`;
-          const thumbPath = join(uploadsDir, thumbName);
-          await sharp(buffer)
+          const thumbBuffer = await sharp(buffer)
             .resize({ width: THUMB_WIDTH, withoutEnlargement: true })
             .webp({ quality: 80 })
-            .toFile(thumbPath);
-          thumbnailUrl = `/uploads/${thumbName}`;
-        } catch { /* skip thumbnail on error, keep original */ }
+            .toBuffer();
+          const thumbName = file.name.replace(/\.[^.]+$/, "") + "_thumb.webp";
+          const thumb = await uploadFile(thumbBuffer, thumbName, "image/webp");
+          thumbnailUrl = thumb.url;
+        } catch { /* skip thumbnail */ }
       }
 
       const record = await db.file.create({
-        data: {
-          name: file.name,
-          size: file.size,
-          mime: file.type,
-          path: safeName,
-          url:  `/uploads/${safeName}`,
-          thumbnailUrl,
-        },
+        data: { name: file.name, size: file.size, mime: file.type, path, url, thumbnailUrl },
       });
-
       saved.push(record);
     }
 

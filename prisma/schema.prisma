@@ -137,8 +137,12 @@ model Page {
   blocks      String    @default("[]")     // JSON array of block objects
   seoTitle    String?
   seoDesc     String?
+  pageViews   Int       @default(0)
+  workspaceId String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId])
 }
 
 model Relation {
@@ -196,20 +200,47 @@ model FlowRun {
 }
 
 model NavMenu {
-  id        String   @id @default(cuid())
-  name      String
-  items     String   @default("[]") // JSON: [{id, label, href}]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  items       String   @default("[]") // JSON: [{id, label, href}]
+  workspaceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
 }
 
 model FormSubmission {
-  id        String   @id @default(cuid())
-  pageId    String
-  pageSlug  String
-  blockId   String
-  data      String   @default("{}") // JSON: { fieldLabel: value }
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  pageId      String
+  pageSlug    String
+  blockId     String
+  data        String   @default("{}") // JSON: { fieldLabel: value }
+  workspaceId String?
+  createdAt   DateTime @default(now())
+
+  @@index([workspaceId])
+}
+
+model Workspace {
+  id        String            @id @default(cuid())
+  name      String
+  slug      String            @unique
+  plan      String            @default("free") // "free" | "pro" | "enterprise"
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  members   WorkspaceMember[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userEmail   String
+  role        String    @default("member") // "owner" | "admin" | "member"
+  invitedAt   DateTime  @default(now())
+
+  @@unique([workspaceId, userEmail])
 }
 
 model GitIntegration {

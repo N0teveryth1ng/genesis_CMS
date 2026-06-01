@@ -3,9 +3,14 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { broadcast } from "@/lib/sse";
+import { getActiveWorkspaceId } from "@/lib/workspace-context";
 
 export async function getPages() {
-  return db.page.findMany({ orderBy: { createdAt: "desc" } });
+  const wsId = await getActiveWorkspaceId();
+  return db.page.findMany({
+    where:   wsId ? { OR: [{ workspaceId: wsId }, { workspaceId: null }] } : undefined,
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 export async function getPage(id: string) {
@@ -25,7 +30,8 @@ export async function createPage(fd: FormData) {
   const existing = await db.page.findUnique({ where: { slug } });
   if (existing) throw new Error("A page with this slug already exists");
 
-  const page = await db.page.create({ data: { title, slug } });
+  const wsId = await getActiveWorkspaceId();
+  const page = await db.page.create({ data: { title, slug, workspaceId: wsId } });
   revalidatePath("/pages");
   return page;
 }

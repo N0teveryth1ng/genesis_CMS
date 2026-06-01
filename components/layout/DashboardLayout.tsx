@@ -7,7 +7,9 @@ import CommandPalette   from "./CommandPalette";
 import RealtimeProvider from "@/components/realtime/RealtimeProvider";
 import { useUIStore }   from "@/lib/stores/ui";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+type Workspace = { id: string; name: string; plan: string };
+
+export default function DashboardLayout({ children, workspaces = [] }: { children: React.ReactNode; workspaces?: Workspace[] }) {
   const theme = useUIStore((s) => s.theme);
 
   /* Apply saved theme on mount */
@@ -18,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <RealtimeProvider>
       <div className="flex h-full min-h-screen overflow-hidden">
-        <Sidebar />
+        <Sidebar workspaces={workspaces} />
 
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
           <Header />
