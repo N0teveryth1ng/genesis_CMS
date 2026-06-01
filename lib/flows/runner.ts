@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/lib/db";
-import type { FlowStep, TriggerConfig } from "@/lib/actions/flows";
+import type { FlowStep } from "@/lib/actions/flows";
 
 type RunContext = {
   trigger: string;

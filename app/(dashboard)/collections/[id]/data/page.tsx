@@ -22,6 +22,7 @@ export default async function DataBrowserPage({ params }: { params: Promise<{ id
   const role = (session?.user as { role?: string })?.role ?? "viewer";
 
   let collection;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let recordsData: { records: any[]; total: number } = { records: [], total: 0 };
   let perms: { canRead: boolean; canCreate: boolean; canUpdate: boolean; canDelete: boolean };
 
@@ -54,6 +55,7 @@ export default async function DataBrowserPage({ params }: { params: Promise<{ id
 
   return (
     <DataBrowserClient
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection={collection as any}
       initialRecords={recordsData.records}
       total={recordsData.total}

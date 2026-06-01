@@ -103,6 +103,7 @@ export default function GraphQLPlayground() {
   // Auto-load API key from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("genesis_gql_apikey");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setApiKey(stored);
   }, []);
 

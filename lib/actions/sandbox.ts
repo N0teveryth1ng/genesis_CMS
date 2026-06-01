@@ -145,8 +145,9 @@ async function runPipeline(git: { owner: string; repo: string; branch: string; a
     try {
       await execAsync("npm install --prefer-offline --no-engine-strict --legacy-peer-deps", { cwd: repoDir, timeout: 180_000 });
       await log("✅ Dependencies installed.");
-    } catch (err: any) {
-      await log(`❌ npm install failed: ${err.stderr ?? err.message}`);
+    } catch (err: unknown) {
+      const e = err as { stderr?: string; message?: string };
+      await log(`❌ npm install failed: ${e.stderr ?? e.message ?? String(err)}`);
       await setStatus("failed");
       return;
     }
@@ -176,8 +177,6 @@ async function runPipeline(git: { owner: string; repo: string; branch: string; a
   child.stdout?.on("data", async (d: Buffer) => { await log(d.toString().trimEnd()); });
   child.stderr?.on("data", async (d: Buffer) => { await log(d.toString().trimEnd()); });
 
-  let processExitedEarly = false;
-
   child.on("error", async (err) => {
     await log(`⚠️ Process error: ${err.message}`);
   });
@@ -187,7 +186,6 @@ async function runPipeline(git: { owner: string; repo: string; branch: string; a
   // Let waitForPort be the source of truth.
   child.on("exit", async (code) => {
     if (code !== 0 && code !== null) {
-      processExitedEarly = true;
       await log(`⚠️ Launcher exited with code ${code} — checking if port ${PORT} is still active…`);
     }
   });

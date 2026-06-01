@@ -8,7 +8,6 @@ import {
   ArrowRight, Hash,
 } from "lucide-react";
 import { useUIStore } from "@/lib/stores/ui";
-import { cn } from "@/lib/utils";
 
 /* ── Nav items searchable in palette ───────────────────────── */
 const ITEMS = [
@@ -39,6 +38,7 @@ export default function CommandPalette() {
   /* Focus input on open */
   useEffect(() => {
     if (cmdOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery("");
       setSelected(0);
       setTimeout(() => inputRef.current?.focus(), 50);
@@ -46,6 +46,7 @@ export default function CommandPalette() {
   }, [cmdOpen]);
 
   /* Reset selected when filtered changes */
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setSelected(0); }, [query]);
 
   /* Keyboard nav */

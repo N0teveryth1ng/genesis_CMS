@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Trash2, Users, Crown, Shield, User2,
+  Plus, Trash2, Crown, Shield, User2,
   Building2, Loader2, Check, X, Mail, Sparkles,
 } from "lucide-react";
 import {
@@ -78,16 +78,13 @@ function WorkspaceCard({
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole]   = useState("member");
   const [inviting, setInviting]       = useState(false);
-  const [saved, setSaved]             = useState(false);
   const [confirmDel, setConfirmDel]   = useState(false);
 
   async function save() {
     start(async () => {
       await updateWorkspace(ws.id, { name, plan });
-      setSaved(true);
       setEditing(false);
       router.refresh();
-      setTimeout(() => setSaved(false), 2000);
     });
   }
 

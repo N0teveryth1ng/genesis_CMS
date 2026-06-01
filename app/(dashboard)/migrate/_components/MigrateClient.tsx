@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Copy, Check, GitBranch, Globe, ArrowRight, Code2, Package, Zap } from "lucide-react";
 import type { ApiKey } from "@prisma/client";
 
@@ -169,6 +170,7 @@ onMounted(async () => {
 }
 
 export default function MigrateClient({ git, col, apiKeys }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   git: any; col: any; apiKeys: ApiKey[];
 }) {
   const [framework, setFramework] = useState<Framework>("nextjs");
@@ -205,11 +207,11 @@ export default function MigrateClient({ git, col, apiKeys }: {
           </p>
         </div>
         {col && (
-          <a href="/collections/site_content/data"
+          <Link href="/collections/site_content/data"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
             style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
             <Globe size={12} /> Edit Content
-          </a>
+          </Link>
         )}
       </div>
 
@@ -267,13 +269,13 @@ export default function MigrateClient({ git, col, apiKeys }: {
 
         <Step n={framework === "nextjs" ? 4 : 3} title="Go to Site Content and fill in your content">
           <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
-            Edit all your website's text, links, and images from one place — no code needed.
+            Edit all your website&apos;s text, links, and images from one place — no code needed.
           </p>
-          <a href="/collections"
+          <Link href="/collections"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold"
             style={{ background: "var(--primary)", color: "var(--text-inverse)" }}>
             Open Site Content <ArrowRight size={14} />
-          </a>
+          </Link>
         </Step>
       </div>
 

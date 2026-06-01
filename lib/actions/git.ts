@@ -83,8 +83,10 @@ export async function getGitCollections(): Promise<GitCollection[]> {
       return [];
     }
 
-    return config.collections.map((col: any, index: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return config.collections.map((col: any) => {
       const colId = `git-${col.name}`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fields = (col.fields ?? []).map((f: any, fIndex: number) => ({
         id: `git-field-${col.name}-${f.name}`,
         collectionId: colId,
@@ -191,6 +193,7 @@ export async function getGitRecords(collectionId: string, page = 1, pageSize = 5
           const fileMeta = await detailRes.json();
           const rawContent = Buffer.from(fileMeta.content, "base64").toString("utf-8");
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let parsedData: Record<string, any> = {};
 
           if (col.format === "json") {
@@ -480,6 +483,7 @@ export async function fetchUserRepos(token: string) {
     const repos = await res.json();
     if (!Array.isArray(repos)) return [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return repos.map((r: any) => ({
       id: String(r.id),
       name: r.name,

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Zap, Plus, Trash2, Play, Loader2, CheckCircle2, XCircle,
+  Zap, Plus, Trash2, Play, Loader2,
   ChevronRight, Circle,
 } from "lucide-react";
 import Link from "next/link";

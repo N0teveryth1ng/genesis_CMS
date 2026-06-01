@@ -249,6 +249,7 @@ function GitHubSyncTab({
 
   // Automated connection states
   const [gitToken, setGitToken] = useState(gitIntegration.accessToken ?? "");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [reposList, setReposList] = useState<any[]>([]);
   const [fetchingRepos, setFetchingRepos] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -293,6 +294,7 @@ function GitHubSyncTab({
   // Effect to automatically fetch repositories if we have a valid, saved token
   useEffect(() => {
     if (gitIntegration.accessToken && gitIntegration.accessToken !== "••••••••") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGitToken(gitIntegration.accessToken);
     }
   }, [gitIntegration.accessToken]);
@@ -300,6 +302,7 @@ function GitHubSyncTab({
   // Effect to listen for OAuth callback success/error query params
   useEffect(() => {
     if (syncStatus === "success") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus({ type: "success", msg: "Successfully authorized and linked your actual GitHub account!" });
       window.history.replaceState({}, "", "/settings");
       
@@ -580,7 +583,7 @@ function GitHubSyncTab({
                       
                       <div className="flex flex-col gap-3.5 pl-3 border-l-2" style={{ borderColor: "var(--border)" }}>
                         <div>
-                          <strong style={{ color: "var(--text)" }}>1. Open Developer Settings:</strong> Visit <a href="https://github.com/settings/developers" target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300 underline font-semibold cursor-pointer">GitHub Developer Settings</a> and click **"New OAuth App"**.
+                          <strong style={{ color: "var(--text)" }}>1. Open Developer Settings:</strong> Visit <a href="https://github.com/settings/developers" target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300 underline font-semibold cursor-pointer">GitHub Developer Settings</a> and click **&quot;New OAuth App&quot;**.
                         </div>
                         <div>
                           <strong style={{ color: "var(--text)" }}>2. Fill Registration Details:</strong>
@@ -602,12 +605,12 @@ function GitHubSyncTab({
                           </ul>
                         </div>
                         <div>
-                          <strong style={{ color: "var(--text)" }}>3. Copy Credentials & Update `.env`:</strong> Click "Register application". Copy the generated <strong style={{ color: "var(--text)" }}>Client ID</strong> and generate a new <strong style={{ color: "var(--text)" }}>Client Secret</strong>. Paste them in your <code className="bg-raised px-1 rounded font-mono text-emerald-400" style={{ background: "var(--bg-raised)" }}>.env</code> file:
+                          <strong style={{ color: "var(--text)" }}>3. Copy Credentials & Update `.env`:</strong> Click &quot;Register application&quot;. Copy the generated <strong style={{ color: "var(--text)" }}>Client ID</strong> and generate a new <strong style={{ color: "var(--text)" }}>Client Secret</strong>. Paste them in your <code className="bg-raised px-1 rounded font-mono text-emerald-400" style={{ background: "var(--bg-raised)" }}>.env</code> file:
                           <div className="relative mt-2 p-3 rounded-lg font-mono text-[11px] select-all flex justify-between items-center"
                             style={{ background: "var(--bg-raised)", border: "1px solid var(--border-light)" }}>
                             <pre style={{ margin: 0, color: "var(--text)" }}>
-                              GITHUB_CLIENT_ID="your_client_id"<br/>
-                              GITHUB_CLIENT_SECRET="your_client_secret"
+                              {`GITHUB_CLIENT_ID="your_client_id"`}<br/>
+                              {`GITHUB_CLIENT_SECRET="your_client_secret"`}
                             </pre>
                             <button
                               type="button"

@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { registerLocal, unregisterLocal, subscribeRedis, broadcastLocal } from "@/lib/pubsub";
+import { registerLocal, unregisterLocal, subscribeRedis } from "@/lib/pubsub";
 import { hasRedis } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";

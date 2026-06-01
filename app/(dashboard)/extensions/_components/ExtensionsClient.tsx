@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Puzzle, Plus, Trash2, Loader2, Settings2, ToggleLeft, ToggleRight, X } from "lucide-react";
+import { Plus, Trash2, Loader2, Settings2, ToggleLeft, ToggleRight, X } from "lucide-react";
 import { installExtension, updateExtension, uninstallExtension } from "@/lib/actions/extensions";
 import type { Plugin, PluginConfigField } from "@/lib/extensions/registry";
 
@@ -297,7 +297,7 @@ export default function ExtensionsClient({ plugins, installed, collections }: {
       <div>
         <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>Extensions</h1>
         <p className="text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
-          Install plugins that transform record data before it's saved.
+          Install plugins that transform record data before it&apos;s saved.
         </p>
       </div>
 

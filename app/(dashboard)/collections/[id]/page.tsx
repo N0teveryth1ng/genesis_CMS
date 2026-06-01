@@ -28,6 +28,7 @@ export default async function CollectionDetailPage({ params }: { params: Promise
 
   return (
     <CollectionDetailClient
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection={collection as any}
       relations={relations}
       allCollections={allCollections.map((c) => ({ id: c.id, name: c.name, label: c.label }))}

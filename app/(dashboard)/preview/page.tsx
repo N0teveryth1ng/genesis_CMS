@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useTransition, useRef, useCallback } from "react";
+import Link from "next/link";
 import { getPages } from "@/lib/actions/pages";
 import { getSandboxStatus, deploySandboxRepository, stopSandboxServer, clearSandboxLogs } from "@/lib/actions/sandbox";
 import { triggerGitWebhook } from "@/lib/actions/git";
 import {
-  Laptop, Tablet, Smartphone, ExternalLink, Globe,
+  Laptop, Tablet, Smartphone, ExternalLink,
   RefreshCw, Loader2, CheckCircle2, AlertCircle, LayoutTemplate,
   Zap, Play, Square, Terminal, ChevronDown, ChevronUp,
 } from "lucide-react";
@@ -25,6 +26,7 @@ export default function PreviewPage() {
   const [pages, setPages]           = useState<Page[]>([]);
   const [activePage, setActivePage] = useState<Page | null>(null);
   const [device, setDevice]         = useState<Device>("desktop");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sandbox, setSandbox]       = useState<any>(null);
   const [showLogs, setShowLogs]     = useState(false);
   const [webhookRes, setWebhookRes] = useState<{ ok: boolean; msg: string } | null>(null);
@@ -248,10 +250,10 @@ export default function PreviewPage() {
               ) : (
                 <EmptyState icon={<LayoutTemplate size={28} />}
                   message="No published pages yet."
-                  action={<a href="/pages" className="text-xs font-semibold px-4 py-2 rounded-lg"
+                  action={<Link href="/pages" className="text-xs font-semibold px-4 py-2 rounded-lg"
                     style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
                     Go to Pages →
-                  </a>}
+                  </Link>}
                 />
               )}
             </div>

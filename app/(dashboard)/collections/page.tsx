@@ -13,6 +13,7 @@ export default async function CollectionsPage() {
   ]);
 
   // Combine them into a single list
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const collections = [...dbCollections, ...gitCollections] as any[];
 
   return <CollectionsClient collections={collections} />;

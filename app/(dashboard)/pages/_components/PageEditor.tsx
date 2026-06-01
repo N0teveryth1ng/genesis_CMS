@@ -787,6 +787,7 @@ export default function PageEditor({ page, pages, menus }: {
               </button>
             </div>
           )}
+          {/* eslint-disable-next-line react-hooks/refs */}
           {blocks.map((block, i) => (
             <BlockCard
               key={block.id}

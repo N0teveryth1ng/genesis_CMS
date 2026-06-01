@@ -18,6 +18,7 @@ export default function RepoContentEditor({
 
   // Load saved patches when repoKey changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEditMode(false);
     editModeRef.current = false;
     try {

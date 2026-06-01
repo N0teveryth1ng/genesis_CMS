@@ -16,7 +16,6 @@ import {
   insertDynamicRow,
   updateDynamicRow,
   deleteDynamicRow,
-  getDynamicRow,
   queryDynamicRows,
   queryDynamicRowsAdvanced,
   type FilterClause,

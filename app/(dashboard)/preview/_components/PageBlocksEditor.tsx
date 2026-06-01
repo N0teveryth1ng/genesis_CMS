@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { updatePageBlocks } from "@/lib/actions/pages";
 import type { Page } from "@prisma/client";
 import {
   Navigation, Type, LayoutGrid, MessageSquare, AlignLeft,
   Image as ImageIcon, ExternalLink, Mail, Footprints, Minus, Columns2,
-  ChevronDown, ChevronRight, Save, Check, Loader2, RefreshCw,
-  Globe, LayoutTemplate, GripVertical,
+  ChevronDown, ChevronRight, Check, Loader2, RefreshCw,
+  LayoutTemplate, GripVertical,
 } from "lucide-react";
 
 interface Block { id: string; type: string; data: Record<string, string> }
@@ -119,6 +120,7 @@ export default function PageBlocksEditor({
 
   // Re-initialise whenever the selected page changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!activePage) { setBlocks([]); return; }
     try {
       const parsed = JSON.parse((activePage.blocks as string) ?? "[]");
@@ -127,6 +129,7 @@ export default function PageBlocksEditor({
     setOpen("");
     setStatus("idle");
     clearTimeout(saveTimer.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePage?.id]);
 
   const persist = useCallback(async (nextBlocks: Block[]) => {
@@ -166,10 +169,10 @@ export default function PageBlocksEditor({
       <div className="flex flex-col items-center gap-3 py-12 px-6 text-center">
         <LayoutTemplate size={20} style={{ color: "var(--text-muted)" }} />
         <p className="text-xs" style={{ color: "var(--text-muted)" }}>No published pages yet.</p>
-        <a href="/pages" className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+        <Link href="/pages" className="text-xs font-semibold px-3 py-1.5 rounded-lg"
           style={{ background: "var(--primary-dim)", color: "var(--primary)" }}>
           Create a Page →
-        </a>
+        </Link>
       </div>
     );
   }
@@ -218,12 +221,13 @@ export default function PageBlocksEditor({
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
               This page has no blocks yet.
             </p>
-            <a href={activePage ? `/pages/${activePage.id}` : "/pages"}
+            <Link href={activePage ? `/pages/${activePage.id}` : "/pages"}
               className="text-xs font-semibold" style={{ color: "var(--primary)" }}>
               Open block editor →
-            </a>
+            </Link>
           </div>
         ) : (
+          // eslint-disable-next-line react-hooks/refs
           blocks.map((block, idx) => {
             const meta   = BLOCK_META[block.type] ?? { label: block.type, icon: Type, color: "#94A3B8", fields: [] };
             const Icon   = meta.icon;

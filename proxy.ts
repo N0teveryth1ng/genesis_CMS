@@ -45,7 +45,7 @@ export async function proxy(request: NextRequest) {
   /* ── Rate limiting ───────────────────────────────────────── */
   for (const rl of RATE_LIMITS) {
     if (pathname.startsWith(rl.prefix)) {
-      const { allowed, remaining, resetAt } = rateLimit(`${rl.key}:${ip}`, rl.limit, rl.window);
+      const { allowed, resetAt } = rateLimit(`${rl.key}:${ip}`, rl.limit, rl.window);
       if (!allowed) {
         return NextResponse.json(
           { error: "Too many requests" },

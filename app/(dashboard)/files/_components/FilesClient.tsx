@@ -207,6 +207,7 @@ function FileCard({ file }: { file: DbFile }) {
           </button>
           <div onClick={(e) => e.stopPropagation()} className="flex flex-col items-center gap-4 max-w-3xl w-full">
             {isImage(file.mime) ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={file.url}
                 alt={file.name}
@@ -286,6 +287,7 @@ function UploadZone({ onUploaded }: { onUploaded: () => void }) {
     e.preventDefault();
     setDragging(false);
     uploadFiles(e.dataTransfer.files);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

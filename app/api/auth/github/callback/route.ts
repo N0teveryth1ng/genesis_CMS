@@ -62,10 +62,11 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.redirect(new URL("/settings?sync=success", req.url));
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("GitHub OAuth Callback error:", err);
+    const msg = err instanceof Error ? err.message : "Internal server error";
     return NextResponse.redirect(
-      new URL(`/settings?sync=error&msg=${encodeURIComponent(err?.message || "Internal server error")}`, req.url)
+      new URL(`/settings?sync=error&msg=${encodeURIComponent(msg)}`, req.url)
     );
   }
 }

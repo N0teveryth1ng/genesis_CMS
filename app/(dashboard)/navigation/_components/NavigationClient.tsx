@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Trash2, GripVertical, Save, Loader2, Check,
+  Plus, GripVertical, Save, Loader2, Check,
   X, ExternalLink, Link2, Globe,
 } from "lucide-react";
 import {
@@ -144,6 +144,7 @@ function MenuEditor({ menu, pages, onClose }: {
             No items yet. Add links below.
           </p>
         )}
+        {/* eslint-disable-next-line react-hooks/refs */}
         {items.map((item, i) => (
           <ItemRow
             key={item.id}

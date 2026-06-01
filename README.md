@@ -1,6 +1,6 @@
 # Genesis CMS
 
-> **The open-source headless CMS that gives you Directus-grade power with a Wix-grade experience — built on Next.js 15, Prisma, and PostgreSQL.**
+> **The open-source headless CMS that gives you Directus-grade power with a Wix-grade experience — built on Next.js 16, Prisma, and PostgreSQL.**
 
 Genesis CMS is a full-stack, self-hosted content management system engineered for developers who need a production-grade backend without the infrastructure overhead. Every collection you define becomes a real typed PostgreSQL table. Every API is auto-generated. Every workflow is visual.
 
@@ -17,12 +17,18 @@ Genesis CMS is a full-stack, self-hosted content management system engineered fo
 7. [Flows — Automation Engine](#7-flows--automation-engine)
 8. [Extensions — Plugin System](#8-extensions--plugin-system)
 9. [Relationships](#9-relationships)
-10. [Authentication & Permissions](#10-authentication--permissions)
-11. [Tech Stack](#11-tech-stack)
-12. [Directory Structure](#12-directory-structure)
-13. [Getting Started](#13-getting-started)
-14. [Environment Variables](#14-environment-variables)
-15. [Roadmap](#15-roadmap)
+10. [Page Builder](#10-page-builder)
+11. [Real-time & SSE](#11-real-time--sse)
+12. [Workspaces](#12-workspaces)
+13. [Media Transforms](#13-media-transforms)
+14. [Analytics](#14-analytics)
+15. [Security](#15-security)
+16. [Authentication & Permissions](#16-authentication--permissions)
+17. [Tech Stack](#17-tech-stack)
+18. [Directory Structure](#18-directory-structure)
+19. [Getting Started](#19-getting-started)
+20. [Environment Variables](#20-environment-variables)
+21. [Roadmap](#21-roadmap)
 
 ---
 
@@ -37,7 +43,7 @@ When you create a collection called `Blog Posts`, Genesis:
 - Provides a full CRUD data browser in the dashboard
 - Fires your Flows automation on every record event
 
-No YAML. No custom DSLs. Just a UI and real SQL.
+On top of the data layer sits a full page-building suite, multi-tenant workspace isolation, real-time SSE broadcasting, S3-compatible file storage, a job queue, and production-ready security hardening — all in one repo.
 
 ---
 
@@ -51,61 +57,78 @@ No YAML. No custom DSLs. Just a UI and real SQL.
 | DB Introspection | ✅ | Import existing Postgres tables as collections |
 | Relationships (M2O, O2M, M2M) | ✅ | Junction tables auto-created |
 | Flows automation | ✅ | Trigger → Condition → Action visual builder |
-| Extensions plugin system | ✅ | Data transforms before save (slug, wordcount, etc.) |
+| Extensions plugin system | ✅ | Data transforms before save |
 | Role-based permissions | ✅ | Per-collection read/create/update/delete |
 | API Key management | ✅ | SHA-256 hashed, read or read_write |
 | Webhooks | ✅ | Per-collection, per-event, with secret signing |
 | Audit Log | ✅ | Full trail of all mutations |
-| File uploads | ✅ | Local disk + auto-thumbnail generation |
-| Page builder | ✅ | Block-based visual page editor |
+| File uploads | ✅ | Local disk or S3/R2 + auto-thumbnail |
+| Page builder | ✅ | Block-based visual editor, 12 block types |
+| Style editor | ✅ | Per-block colors, fonts, padding, radius |
+| Template library | ✅ | 5 pre-built page layouts |
+| Form builder | ✅ | Contact forms → DB submissions |
+| Navigation menus | ✅ | Drag-and-drop nav menus linked to Navbar blocks |
+| SEO & publishing | ✅ | `seoTitle`, `seoDesc`, OpenGraph, Twitter card |
 | Live Preview | ✅ | Real-time site preview inside dashboard |
-| Git Integration | ✅ | Sync config with GitHub repo |
+| Real-time SSE | ✅ | Live notifications on save/publish/form submit |
+| Multi-tenant workspaces | ✅ | Workspace isolation, members, plan tiers |
+| Media transforms | ✅ | Sharp-powered resize/crop/format via API |
+| Analytics & Insights | ✅ | Page views, form submissions, activity charts |
+| Security hardening | ✅ | Proxy middleware, rate limiting, CORS, 401/407 gates |
+| Cloud storage | ✅ | S3 / Cloudflare R2 abstraction layer |
+| Redis pub/sub | ✅ | Multi-process SSE; falls back to in-process |
+| Job queue | ✅ | BullMQ for webhooks, flows, email (requires Redis) |
+| Structured logging | ✅ | Pino JSON logger, secrets redacted |
+| Email notifications | ✅ | Resend integration for workspace invites |
+| Sentry integration | ✅ | Error tracking (opt-in via DSN env var) |
+| CI/CD pipeline | ✅ | GitHub Actions: lint → typecheck → build → deploy |
+| Health check endpoint | ✅ | `/api/health` — DB + Redis + storage status |
 | Migration Kit | ✅ | Import/export data between environments |
-| Multi-tenant | 🔜 | Phase 15 — schema-per-tenant |
-| Media transforms | 🔜 | Phase 16 — on-the-fly resize/crop |
-| Analytics | 🔜 | Phase 17 — real usage metrics |
+| Git Integration | ✅ | Sync config with GitHub repo |
 
 ---
 
 ## 3. System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Genesis CMS                              │
-│                    (Next.js 15 App Router)                       │
-├────────────────────────┬────────────────────────────────────────┤
-│      Dashboard UI      │           API Layer                     │
-│   (React Server +      │                                         │
-│    Client Components)  │  ┌─────────────────────────────────┐   │
-│                        │  │  REST  /api/v1/[collection]      │   │
-│  /collections          │  │  REST  /api/v1/[collection]/[id] │   │
-│  /collections/[id]     │  │  GraphQL  /api/graphql           │   │
-│  /collections/[id]/data│  │  Upload   /api/upload            │   │
-│  /flows                │  │  Auth     /api/auth/[...]        │   │
-│  /flows/[id]           │  └─────────────────────────────────┘   │
-│  /extensions           │                                         │
-│  /graphql              │           Server Actions                │
-│  /api-keys             │  ┌─────────────────────────────────┐   │
-│  /webhooks             │  │  collections.ts  records CRUD   │   │
-│  /audit                │  │  flows.ts        flow mgmt      │   │
-│  /files                │  │  extensions.ts   plugin mgmt    │   │
-│  /pages                │  │  webhooks.ts     webhook fire   │   │
-│  /settings             │  │  audit.ts        event logging  │   │
-│  /migrate              │  │  relations.ts    FK mgmt        │   │
-│  /roles                │  └─────────────────────────────────┘   │
-└────────────────────────┴────────────────────────────────────────┘
-                                    │
-                    ┌───────────────▼───────────────┐
-                    │         Prisma ORM             │
-                    │   (schema-managed models)      │
-                    └───────────────┬───────────────┘
-                                    │
-                    ┌───────────────▼───────────────┐
-                    │      PostgreSQL (Neon)          │
-                    │                                │
-                    │  Prisma tables (fixed schema)  │
-                    │  Dynamic tables (raw DDL)       │
-                    └────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                         Genesis CMS                                  │
+│                     (Next.js 16 App Router)                          │
+├──────────────────────────┬──────────────────────────────────────────┤
+│       Dashboard UI       │            API Layer                       │
+│   (React Server +        │                                            │
+│    Client Components)    │  ┌──────────────────────────────────┐     │
+│                          │  │  REST    /api/v1/[collection]     │     │
+│  /collections            │  │  GraphQL /api/graphql             │     │
+│  /pages                  │  │  Upload  /api/upload              │     │
+│  /navigation             │  │  Forms   /api/forms               │     │
+│  /forms                  │  │  SSE     /api/sse                 │     │
+│  /workspaces             │  │  Media   /api/media/transform     │     │
+│  /insights               │  │  Health  /api/health              │     │
+│  /flows                  │  └──────────────────────────────────┘     │
+│  /extensions             │                                            │
+│  /files                  │       Proxy Middleware (proxy.ts)          │
+│  /graphql                │  ┌──────────────────────────────────┐     │
+│  /api-keys               │  │  Auth guard → 307/401            │     │
+│  /webhooks               │  │  Rate limiting (per IP+route)    │     │
+│  /audit                  │  │  CORS headers + OPTIONS          │     │
+│  /settings               │  └──────────────────────────────────┘     │
+│  /migrate                │                                            │
+└──────────────────────────┴──────────────────────────────────────────┘
+                                      │
+              ┌───────────────────────┼────────────────────────┐
+              │                       │                        │
+  ┌───────────▼──────┐   ┌────────────▼──────┐   ┌───────────▼──────┐
+  │   Prisma ORM     │   │  Redis (optional)  │   │  Storage          │
+  │  (fixed schema)  │   │                    │   │  local / S3 / R2  │
+  └───────────┬──────┘   │  pub/sub for SSE   │   └──────────────────┘
+              │           │  BullMQ job queue  │
+  ┌───────────▼──────┐   └────────────────────┘
+  │  PostgreSQL      │
+  │  (Neon)          │
+  │  Prisma tables   │
+  │  Dynamic tables  │
+  └──────────────────┘
 ```
 
 ### Request Lifecycle
@@ -114,23 +137,21 @@ No YAML. No custom DSLs. Just a UI and real SQL.
 Client Request
       │
       ▼
-Next.js Edge / Node Runtime
+proxy.ts  ← rate limit | auth guard | CORS
       │
-      ├── API Route Handler
-      │         │
-      │         ├── authenticate()      ← SHA-256 API key lookup
-      │         │
-      │         ├── applyExtensions()   ← transform data (before save)
-      │         │
-      │         ├── insertDynamicRow() / updateDynamicRow()
-      │         │         │
-      │         │         └── $queryRawUnsafe → PostgreSQL
-      │         │
-      │         ├── fireWebhooks()      ← async, fire-and-forget
-      │         ├── triggerFlows()      ← async, fire-and-forget
-      │         └── logAudit()          ← async, fire-and-forget
+      ▼
+Next.js Route Handler / Server Action
       │
-      └── JSON Response
+      ├── authenticate()       ← session or API key
+      ├── applyExtensions()    ← transform data before save
+      ├── insertDynamicRow()   ← $queryRawUnsafe → PostgreSQL
+      ├── fireWebhooks()       ← enqueue(BullMQ) or async fire
+      ├── triggerFlows()       ← enqueue(BullMQ) or async run
+      ├── broadcast()          ← Redis pub/sub or local SSE Set
+      └── logAudit()           ← fire-and-forget
+      │
+      ▼
+JSON / HTML / Stream Response
 ```
 
 ---
@@ -143,50 +164,35 @@ Next.js Edge / Node Runtime
 PostgreSQL Database (Neon)
 │
 ├─── LAYER 1: Prisma-Managed Tables (Fixed Schema)
-│    │
-│    ├── "User"           — CMS users, roles, auth
-│    ├── "Collection"     — collection metadata (name, label, icon, tableName)
-│    ├── "Field"          — field definitions per collection
-│    ├── "Record"         — legacy JSON blob store (pre-v1 compat only)
-│    ├── "Relation"       — M2O / O2M / M2M relationship registry
-│    ├── "Flow"           — automation flow definitions
-│    ├── "FlowRun"        — execution history with logs
-│    ├── "Extension"      — installed plugin instances
-│    ├── "Webhook"        — outbound webhook configs
-│    ├── "ApiKey"         — hashed API keys
-│    ├── "Permission"     — role-based per-collection permissions
-│    ├── "AuditLog"       — immutable event trail
-│    ├── "File"           — uploaded file metadata
-│    ├── "Page"           — visual page builder pages
-│    ├── "Settings"       — singleton site config
-│    └── "GitIntegration" — GitHub sync config
+│    ├── User               — CMS users, roles, auth
+│    ├── Collection         — collection metadata
+│    ├── Field              — field definitions
+│    ├── Record             — legacy JSON blob store
+│    ├── Relation           — M2O / O2M / M2M registry
+│    ├── Flow + FlowRun     — automation definitions + history
+│    ├── Extension          — installed plugin instances
+│    ├── Webhook            — outbound webhook configs
+│    ├── ApiKey             — hashed API keys
+│    ├── Permission         — role-based per-collection ACL
+│    ├── AuditLog           — immutable event trail
+│    ├── File               — uploaded file metadata
+│    ├── Page               — visual page builder pages + views
+│    ├── NavMenu            — navigation menus
+│    ├── FormSubmission     — contact form submissions
+│    ├── Workspace          — multi-tenant workspaces
+│    ├── WorkspaceMember    — workspace membership + roles
+│    ├── Settings           — singleton site config
+│    └── GitIntegration     — GitHub sync config
 │
 └─── LAYER 2: Dynamic Collection Tables (Raw DDL)
-     │
-     ├── "genesis_col_posts"
-     │    ├── id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()
-     │    ├── created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-     │    ├── updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-     │    ├── title       TEXT
-     │    ├── body        TEXT
-     │    ├── slug        TEXT
-     │    └── status      TEXT
-     │
-     ├── "genesis_col_products"
-     │    ├── id, created_at, updated_at
-     │    ├── name        TEXT
-     │    ├── price       NUMERIC
-     │    └── in_stock    BOOLEAN
-     │
-     └── "genesis_jxn_posts_tags"   ← M2M junction table
-          ├── id          TEXT PRIMARY KEY
-          ├── post_id     TEXT NOT NULL
-          └── tag_id      TEXT NOT NULL
+     ├── genesis_col_posts          — user-defined collection
+     ├── genesis_col_products       — user-defined collection
+     └── genesis_jxn_posts_tags     — M2M junction table
 ```
 
-### CMS Type → PostgreSQL Column Type
+### CMS Field Type → PostgreSQL Column Type
 
-| CMS Field Type | PostgreSQL Type |
+| CMS Type | PostgreSQL |
 |---|---|
 | `text`, `textarea`, `email`, `url`, `password`, `select` | `TEXT` |
 | `number` | `NUMERIC` |
@@ -197,481 +203,389 @@ PostgreSQL Database (Neon)
 | `uuid` | `TEXT` |
 | `relation` | `TEXT` (FK value stored as TEXT) |
 
-### Why Two Layers?
-
-The Prisma layer handles **system data** — it needs a known schema for Prisma Client to generate types. The dynamic layer handles **user content** — schemas change at runtime when you add/remove fields. Using `$executeRawUnsafe` and `$queryRawUnsafe` for dynamic tables means zero-downtime schema changes with no migration files.
-
 ---
 
 ## 5. API Layer
 
 ### REST API — `/api/v1/[collection]`
 
-All endpoints require an `Authorization: Bearer <key>` header.
-
-#### `GET /api/v1/{collection}`
-
-List records with full filtering, sorting, search, pagination, field selection, and relation population.
+Requires `Authorization: Bearer <key>`.
 
 ```
-GET /api/v1/posts
-  ?page=1
-  &limit=20
-  &sort=-createdAt                   # prefix - for DESC
-  &search=nextjs                     # full-text across text fields
-  &fields=id,title,slug              # field selection
-  &populate=true                     # inline M2O relations
-  &filter[status][_eq]=published
-  &filter[price][_gte]=100
-  &filter[tags][_in]=tech,design
+GET    /api/v1/{collection}       → list (filter, sort, search, paginate, populate)
+GET    /api/v1/{collection}/{id}  → single record
+POST   /api/v1/{collection}       → create (read_write key)
+PATCH  /api/v1/{collection}/{id}  → partial update (read_write key)
+DELETE /api/v1/{collection}/{id}  → delete (read_write key)
 ```
 
-**Filter Operators**
-
-| Operator | SQL equivalent |
-|---|---|
-| `_eq` | `= value` |
-| `_neq` | `!= value` |
-| `_lt` | `< value` |
-| `_lte` | `<= value` |
-| `_gt` | `> value` |
-| `_gte` | `>= value` |
-| `_contains` | `ILIKE '%value%'` |
-| `_null` | `IS NULL` / `IS NOT NULL` |
-| `_in` | `= ANY(array)` |
-
-**Response**
-```json
-{
-  "data": [
-    {
-      "id": "abc123",
-      "title": "Hello World",
-      "slug": "hello-world",
-      "status": "published",
-      "createdAt": "2026-05-29T10:00:00Z",
-      "updatedAt": "2026-05-29T10:00:00Z"
-    }
-  ],
-  "meta": {
-    "total": 142,
-    "page": 1,
-    "limit": 20,
-    "pages": 8
-  }
-}
+**Query parameters**
+```
+?page=1 &limit=20 &sort=-createdAt &search=nextjs
+&fields=id,title,slug &populate=true
+&filter[status][_eq]=published
+&filter[price][_gte]=100
 ```
 
-#### `GET /api/v1/{collection}/{id}`
+**Filter operators:** `_eq`, `_neq`, `_lt`, `_lte`, `_gt`, `_gte`, `_contains`, `_null`, `_in`
 
-Fetch a single record by ID.
-
-#### `POST /api/v1/{collection}`
-
-Create a record. Requires `read_write` API key. Validates required fields server-side.
-
-```json
-{ "title": "My Post", "status": "draft" }
-```
-
-#### `PATCH /api/v1/{collection}/{id}`
-
-Partial update. Only provided fields are updated — existing fields are preserved.
-
-#### `DELETE /api/v1/{collection}/{id}`
-
-Delete a record. Returns `204 No Content`.
-
-#### CORS
-
-All endpoints respond to `OPTIONS` preflight with `Access-Control-Allow-Origin: *` — suitable for frontend apps on any domain.
+**Rate limit:** 300 requests/min per IP.
 
 ---
 
 ## 6. GraphQL Engine
 
-**Endpoint:** `POST /api/graphql`  
-**Auth:** `Authorization: Bearer <key>`  
-**Schema:** Dynamically generated from live DB collections on every request.
+**Endpoint:** `POST /api/graphql` · **Auth:** `Authorization: Bearer <key>`
 
-### Auto-generated Schema
-
-For every collection, Genesis generates:
-
-```graphql
-# Object type
-type Post {
-  id:        ID!
-  createdAt: String
-  updatedAt: String
-  title:     String
-  slug:      String
-  status:    String
-}
-
-# Paginated list wrapper
-type PostList {
-  data: [Post!]!
-  meta: PageMeta!
-}
-
-type PageMeta {
-  total: Int!
-  page:  Int!
-  limit: Int!
-  pages: Int!
-}
-
-# Input type for mutations
-input PostInput {
-  title:  String
-  slug:   String
-  status: String
-}
-
-type Query {
-  post(id: ID!): Post
-  posts(page: Int, limit: Int, sort: String, search: String): PostList!
-}
-
-type Mutation {
-  create_post(input: PostInput!): Post
-  update_post(id: ID!, input: PostInput!): Post
-  delete_post(id: ID!): Boolean
-}
-```
-
-### Example Queries
-
-```graphql
-# List with pagination
-query {
-  posts(page: 1, limit: 10, sort: "-createdAt") {
-    data { id title slug status }
-    meta { total pages }
-  }
-}
-
-# Single record
-query {
-  post(id: "abc123") {
-    id title body createdAt
-  }
-}
-
-# Create
-mutation {
-  create_post(input: { title: "Hello", status: "draft" }) {
-    id slug
-  }
-}
-
-# Delete
-mutation {
-  delete_post(id: "abc123")
-}
-```
-
-### GraphQL Explorer
-
-Built-in in-dashboard playground at `/graphql`:
-- Split-pane editor (query left, response right)
-- API key bar — persisted to `localStorage`
-- Example query library
-- Tab indent + `Ctrl+Enter` to run
-- Copy response button
+Schema is dynamically generated from live DB collections on every request. For each collection Genesis generates object types, list wrappers, input types, and CRUD queries/mutations. An in-dashboard GraphQL playground is available at `/graphql`.
 
 ---
 
 ## 7. Flows — Automation Engine
 
-Flows are visual automation pipelines triggered by data events.
+Visual automation pipelines triggered by data events.
 
-### Architecture
+**Triggers:** `record.create`, `record.update`, `record.delete`, `manual`
 
-```
-Event (record.create / record.update / record.delete / manual)
-      │
-      ▼
-  triggerFlows()              ← fires from collections.ts, async
-      │
-      ├── query DB for matching active flows
-      │
-      └── for each matching flow:
-              │
-              ▼
-          runFlow()            ← lib/flows/runner.ts
-              │
-              ▼
-          ┌─────────────────────────────────────────┐
-          │         Sequential Step Execution         │
-          │                                           │
-          │  Step 1: condition                        │
-          │    field "status" eq "published"          │
-          │    → PASS → continue                      │
-          │    → FAIL → stop (short-circuit)          │
-          │                                           │
-          │  Step 2: webhook                          │
-          │    POST https://api.example.com/notify    │
-          │    body: {"id":"{{id}}","title":"{{title}}"}│
-          │    → 200 OK → continue                    │
-          │    → error  → stop, status=error          │
-          │                                           │
-          │  Step 3: create_record                    │
-          │    collection: "notifications"            │
-          │    data: {"message":"New: {{title}}"}     │
-          │                                           │
-          │  Step 4: log                              │
-          │    "Processed record {{id}}"              │
-          └─────────────────────────────────────────┘
-                  │
-                  ▼
-              FlowRun saved to DB
-              (status, log lines, duration)
-```
+**Step types:** Condition (field check), Webhook (HTTP), Create Record, Log
 
-### Trigger Types
+**Template variables:** `{{fieldName}}` interpolation from the triggering record.
 
-| Trigger | When it fires |
-|---|---|
-| `record.create` | After a record is created in a collection |
-| `record.update` | After a record is updated |
-| `record.delete` | After a record is deleted |
-| `manual` | Only when "Run" is clicked in the dashboard |
-
-Flows can be scoped to a specific collection or fire on any collection.
-
-### Step Types
-
-| Step | What it does |
-|---|---|
-| **Condition** | Checks a field value — stops the flow if the check fails |
-| **Webhook** | HTTP request (GET/POST/PUT/PATCH) to any URL |
-| **Create Record** | Inserts a new record into any collection |
-| **Log** | Records a message in the run history |
-
-### Template Variables
-
-All text fields in steps support `{{fieldName}}` interpolation resolved from the triggering record's payload:
-
-```
-"New post created: {{title}} by {{author}}"
-→  "New post created: Hello World by Jane"
-```
+When Redis is configured, flow execution is offloaded to BullMQ with automatic retries (exponential backoff, 3 attempts). Without Redis, flows run synchronously in the request thread.
 
 ---
 
 ## 8. Extensions — Plugin System
 
-Extensions are synchronous data-transform plugins that run **before** a record is saved to the database. They are composable and chainable.
+Synchronous data-transform plugins that run **before** a record is saved. Chainable and composable.
 
-### Execution Flow
-
-```
-createRecord(collectionId, rawData)
-      │
-      ▼
-applyExtensions(collectionId, rawData, "create")
-      │
-      ├── load all active extensions from DB
-      ├── filter by collectionId + event
-      │
-      └── chain execute():
-            ext[0].execute(data, config, "create")  → data'
-            ext[1].execute(data', config, "create")  → data''
-            ext[2].execute(data'', config, "create") → data'''
-      │
-      ▼
-insertDynamicRow(tableName, collectionId, data''')
-```
-
-### Built-in Plugins
-
-| Plugin | Category | What it does |
-|---|---|---|
-| 🔗 **Auto Slug** | compute | Generates `slug` from `title` on create. Configurable source/target fields. |
-| 📝 **Word Count** | compute | Counts words in a text field → stores integer in target field |
-| 🔠 **Auto Capitalize** | transform | Capitalizes first letter of a configured field |
-| ⚙️ **Set Defaults** | transform | Fills default values on create if fields are empty |
-| ✂️ **Trim Whitespace** | transform | Strips leading/trailing whitespace from all string fields |
-| 📧 **Lowercase Email** | transform | Forces a configured email field to lowercase |
-
-### Configuration
-
-Each plugin is installed with:
-- **Config** — plugin-specific key/value pairs (e.g. `{ sourceField: "title", targetField: "slug" }`)
-- **Collection scope** — all collections or a specific one
-- **Events** — `create`, `update`, or `create,update`
-
-Multiple instances of the same plugin can be installed with different configs for different collections.
+| Plugin | What it does |
+|---|---|
+| 🔗 Auto Slug | `title` → `slug` on create |
+| 📝 Word Count | Count words in a text field |
+| 🔠 Auto Capitalize | Capitalize first letter |
+| ⚙️ Set Defaults | Fill empty fields on create |
+| ✂️ Trim Whitespace | Strip leading/trailing spaces |
+| 📧 Lowercase Email | Force email field to lowercase |
 
 ---
 
 ## 9. Relationships
 
-Genesis supports three relationship types between collections, backed by real Postgres constraints.
-
-```
-M2O (Many-to-One)
-─────────────────
-posts.author_id ──FK──► authors.id
-
-O2M (One-to-Many)
-──────────────────
-authors.id ◄──── posts[]   (virtual — inverse of an M2O)
-
-M2M (Many-to-Many)
-──────────────────
-posts ◄──── genesis_jxn_posts_tags ────► tags
-```
-
-| Type | DDL Created | Use Case |
+| Type | DDL | Use case |
 |---|---|---|
-| `m2o` | `ALTER TABLE posts ADD COLUMN author_id TEXT` | Post belongs to one Author |
-| `o2m` | Virtual — inverse of an M2O | Author has many Posts |
-| `m2m` | `CREATE TABLE genesis_jxn_{a}_{b} (...)` | Posts have many Tags |
-
-Relations are stored in the `Relation` Prisma table and visible in the Collection detail view.
+| `m2o` | `ALTER TABLE posts ADD COLUMN author_id TEXT` | Post → Author |
+| `o2m` | Virtual (inverse of M2O) | Author has many Posts |
+| `m2m` | `CREATE TABLE genesis_jxn_{a}_{b}` | Posts ↔ Tags |
 
 ---
 
-## 10. Authentication & Permissions
+## 10. Page Builder
 
-### Dashboard Auth
+A visual, block-based page editor at `/pages/[id]`.
 
-NextAuth.js with credential (email/password) and GitHub OAuth providers. Sessions are JWT-based.
+### Block types
 
-### API Auth
+| Block | Description |
+|---|---|
+| **Navbar** | Sticky nav with logo, links, CTA. Supports Navigation Menu dropdown |
+| **Hero** | Full-width heading + subheading + CTA |
+| **Features** | 1–3 column feature grid |
+| **Testimonial** | Quote + author + role |
+| **Text** | Rich freeform text |
+| **Image** | Image with caption + alt |
+| **Button** | Primary / outline / link variants |
+| **Columns** | Two-column text layout |
+| **Divider** | Horizontal rule |
+| **Contact** | Email + phone + address |
+| **Form** | Dynamic form builder → submissions stored in DB |
+| **Footer** | Logo + links + copyright |
+
+### Style editor
+
+Every block has a **Style tab**: background color, text color, padding, font size, font weight, border radius. Changes apply per-block without touching code.
+
+### Templates
+
+5 pre-built page layouts: SaaS Landing, About Page, Contact Page, Blog Post, Portfolio.
+
+### Navigation menus
+
+Create drag-and-drop nav menus at `/navigation`. Menus can be linked to any Navbar block via a dropdown in the editor. Menu items support custom labels and URLs, including links to other published pages.
+
+### Publishing & SEO
+
+Each page has a status (`draft` / `published`). Published pages are served at `/site/[slug]` with full SSR, `seoTitle`, `seoDesc`, OpenGraph, and Twitter card meta. The site renderer tracks `pageViews` on each visit (fire-and-forget).
+
+---
+
+## 11. Real-time & SSE
+
+Genesis broadcasts server-sent events to all connected dashboard clients.
+
+**Endpoint:** `GET /api/sse` — streams `text/event-stream`
+
+**Events:**
+
+| Event | Trigger | Client action |
+|---|---|---|
+| `connected` | On SSE connect | Show green live dot |
+| `page_saved` | `updatePageBlocks` | Toast + `router.refresh()` |
+| `page_published` | `updatePageStatus` | Toast + `router.refresh()` |
+| `form_submitted` | Form API route | Toast notification |
+
+**Transport:**
+- **Without Redis:** module-level `Set<Controller>` (single-process only)
+- **With Redis (`REDIS_URL`):** Redis pub/sub — all server instances receive broadcasts
+
+The `RealtimeProvider` component wraps the dashboard layout, auto-reconnects on disconnect (5s backoff), and shows slide-up toast notifications. A live status dot (green/amber/red) in the header shows connection state.
+
+---
+
+## 12. Workspaces
+
+Multi-tenant workspace isolation at `/workspaces`.
+
+- Create named workspaces with plan tiers (Free / Pro / Enterprise)
+- Invite members by email with role (Owner / Admin / Member)
+- Invitation sends a real HTML email via Resend (when `RESEND_API_KEY` is set)
+- Active workspace stored in an `httpOnly` cookie (`genesis-ws`) — server actions filter `Page` and `NavMenu` queries by workspace
+- Workspace switcher in the sidebar with inline create
+
+---
+
+## 13. Media Transforms
+
+Sharp-powered image transformation via API.
+
+```
+GET /api/media/transform?src=/uploads/photo.jpg&w=800&h=600&q=85&f=webp
+```
+
+**Parameters:**
+
+| Param | Type | Description |
+|---|---|---|
+| `src` | string | Must start with `/uploads/` |
+| `w` | number | Target width (px) |
+| `h` | number | Target height (px) |
+| `q` | 1–100 | Quality (default: 85) |
+| `f` | `webp`\|`jpeg`\|`png` | Output format (default: `webp`) |
+
+Responses are streamed with `Cache-Control: public, max-age=31536000, immutable`.
+
+A **Transform panel** in the Files manager lets you interactively set parameters, live-preview the result, and copy the generated URL.
+
+Requires authentication. Only `/uploads/` paths are allowed (path traversal is blocked at the route handler).
+
+---
+
+## 14. Analytics
+
+Real data at `/insights` — no mocking, no placeholders.
+
+- **Page views** — incremented on every published page visit (fire-and-forget `pageViews` field on `Page`)
+- **Top pages by views** — horizontal SVG bar chart
+- **Form submissions by page** — bar chart
+- **Content overview** — page counts, file count, storage used, audit event count
+- **Recent activity feed** — last 8 audit log entries with icons, user, and relative time
+
+---
+
+## 15. Security
+
+### Proxy middleware (`proxy.ts`)
+
+Every request passes through `proxy.ts` before reaching route handlers:
+
+| Check | Details |
+|---|---|
+| **Auth guard** | Dashboard pages → `307 /login`. Private API routes → `401 Unauthorized` |
+| **Rate limiting** | In-memory sliding window per IP per route |
+| **CORS** | `Access-Control-Allow-Origin` reflected on all `/api/*` responses |
+| **OPTIONS preflight** | `204` with CORS headers |
+
+**Rate limits:**
+
+| Route | Limit |
+|---|---|
+| `/api/forms` | 10 req/min |
+| `/api/upload` | 20 req/min |
+| `/api/media/transform` | 60 req/min |
+| `/api/v1/*` | 300 req/min |
+| `/api/auth/*` | 20 req/min |
+
+### Additional hardening
+
+- Security response headers (HSTS, X-Frame-Options, CSP, Referrer-Policy, Permissions-Policy) via `next.config.ts`
+- Upload: MIME type allowlist + 20 MB size cap
+- Transform: path restricted to `/uploads/` only
+- `lib/validate.ts`: `requireString`, `requireSlug`, `requireEmail`, `stripHtml` helpers
+- Structured logging with automatic secret redaction (`password`, `token`, `secret` fields)
+
+---
+
+## 16. Authentication & Permissions
+
+### Dashboard auth
+
+NextAuth.js with credentials (email/password) and GitHub OAuth. Sessions are JWT-based.
+
+### API auth
 
 ```
 Authorization: Bearer sk-live-xxxxxxxxxxxxxxxxxxxxxxxx
-                              │
-                              ▼
-                    SHA-256 hash → lookup in ApiKey table
-                              │
-                    key.active === true?
-                              │
-                    key.permissions: "read" | "read_write"
-                              │
-                    GET → read key OK
-                    POST/PATCH/DELETE → read_write key required
+                            │
+                            ▼
+                  SHA-256 hash → ApiKey table lookup
+                            │
+                  key.active === true?
+                            │
+                  read → GET only
+                  read_write → POST / PATCH / DELETE
 ```
 
-### Role-Based Permissions
+### Role-based permissions
 
-Two built-in roles: `editor` and `viewer`. Permissions are defined per-collection:
-
-| Permission | `viewer` default | `editor` default |
+| Permission | `viewer` | `editor` |
 |---|---|---|
 | `canRead` | ✅ | ✅ |
 | `canCreate` | ❌ | ✅ |
 | `canUpdate` | ❌ | ✅ |
 | `canDelete` | ❌ | ❌ |
 
-Permissions are checked in the data browser UI and enforced at the action layer.
-
 ---
 
-## 11. Tech Stack
+## 17. Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Framework** | Next.js 15 (App Router, Server Actions, Turbopack) |
+| **Framework** | Next.js 16 (App Router, Server Actions, Turbopack) |
 | **Language** | TypeScript 5 (strict) |
 | **ORM** | Prisma v6 |
 | **Database** | PostgreSQL via Neon (serverless) |
-| **Auth** | NextAuth.js v5 |
+| **Auth** | NextAuth.js v4 |
 | **GraphQL** | graphql-yoga v5 + graphql v16 |
-| **Styling** | Tailwind CSS v4 + CSS custom properties (design tokens) |
-| **State** | Zustand (UI store) |
+| **Styling** | Tailwind CSS v4 + CSS custom properties |
+| **State** | Zustand v5 |
+| **Real-time** | Server-Sent Events (SSE) + Redis pub/sub (ioredis) |
+| **Job queue** | BullMQ (requires Redis) |
+| **File storage** | Local disk or AWS S3 / Cloudflare R2 |
+| **Image processing** | Sharp |
+| **Email** | Resend |
+| **Logging** | Pino (structured JSON) |
+| **Error tracking** | Sentry (opt-in) |
 | **Icons** | Lucide React |
-| **File upload** | Native Next.js API route + sharp (thumbnails) |
-| **Deployment** | Vercel / any Node.js host |
+| **CI/CD** | GitHub Actions |
 
 ---
 
-## 12. Directory Structure
+## 18. Directory Structure
 
 ```
 genesis-cms/
 ├── app/
-│   ├── (dashboard)/              # All authenticated dashboard pages
-│   │   ├── layout.tsx
-│   │   ├── page.tsx              # Overview / home
-│   │   ├── collections/          # Collection list + detail + data browser
-│   │   ├── flows/                # Flow list + visual editor
-│   │   ├── extensions/           # Plugin gallery + installed list
-│   │   ├── graphql/              # In-dashboard GraphQL playground
-│   │   ├── api-keys/             # API key management
-│   │   ├── webhooks/             # Webhook management
-│   │   ├── audit/                # Audit log viewer
-│   │   ├── files/                # File upload + browser
-│   │   ├── pages/                # Visual page builder
-│   │   ├── roles/                # Permission matrix
-│   │   ├── users/                # User management
-│   │   ├── settings/             # Site settings
-│   │   ├── migrate/              # Migration kit
-│   │   └── preview/              # Live site preview
+│   ├── (dashboard)/
+│   │   ├── layout.tsx              # Fetches workspaces, wraps DashboardLayout
+│   │   ├── error.tsx               # Dashboard-scoped error boundary
+│   │   ├── collections/            # Collection list + detail + data browser
+│   │   ├── pages/                  # Visual page builder
+│   │   │   └── [id]/               # Block editor
+│   │   ├── navigation/             # Navigation menu manager
+│   │   ├── forms/                  # Form submissions viewer
+│   │   ├── workspaces/             # Workspace management
+│   │   ├── insights/               # Analytics dashboard
+│   │   ├── files/                  # Media library + transform panel
+│   │   ├── flows/                  # Automation builder
+│   │   ├── extensions/             # Plugin gallery
+│   │   ├── graphql/                # In-dashboard GraphQL playground
+│   │   ├── api-keys/               # API key management
+│   │   ├── webhooks/               # Webhook management
+│   │   ├── audit/                  # Audit log viewer
+│   │   ├── roles/                  # Permission matrix
+│   │   ├── users/                  # User management
+│   │   ├── settings/               # Site settings
+│   │   ├── migrate/                # Migration kit
+│   │   └── preview/                # Live site preview
+│   │
+│   ├── site/
+│   │   ├── [slug]/page.tsx         # Published page renderer (SSR + page views)
+│   │   └── _components/FormBlock.tsx
 │   │
 │   └── api/
-│       ├── v1/
-│       │   ├── [collection]/
-│       │   │   ├── route.ts      # GET (list) + POST (create)
-│       │   │   └── [id]/route.ts # GET + PATCH + DELETE
-│       ├── graphql/
-│       │   └── route.ts          # graphql-yoga endpoint
-│       ├── upload/route.ts
-│       └── auth/[...nextauth]/route.ts
+│       ├── v1/[collection]/        # REST CRUD
+│       ├── graphql/                # GraphQL endpoint
+│       ├── upload/                 # File upload (auth required)
+│       ├── forms/                  # Form submission (public)
+│       ├── sse/                    # Server-sent events stream
+│       ├── media/transform/        # Sharp image transform (auth required)
+│       ├── health/                 # Health check
+│       └── auth/[...nextauth]/
 │
 ├── components/
-│   └── layout/
-│       ├── Sidebar.tsx
-│       ├── Header.tsx
-│       └── DashboardLayout.tsx
+│   ├── layout/
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx              # Live dot + notifications
+│   │   ├── DashboardLayout.tsx
+│   │   ├── WorkspaceSwitcher.tsx
+│   │   └── CommandPalette.tsx
+│   └── realtime/
+│       └── RealtimeProvider.tsx    # SSE subscription + toast stack
 │
 ├── lib/
-│   ├── db.ts                     # Prisma client singleton
-│   ├── db-dynamic.ts             # Raw SQL DDL + DML for dynamic tables
-│   ├── db-introspect.ts          # information_schema reader
-│   ├── utils.ts                  # slugify, cn, etc.
-│   ├── graphql/
-│   │   └── schema.ts             # Dynamic schema builder (SDL + resolvers)
-│   ├── flows/
-│   │   └── runner.ts             # Flow execution engine
-│   ├── extensions/
-│   │   ├── registry.ts           # Built-in plugin definitions + execute()
-│   │   └── runner.ts             # applyExtensions() chain
-│   └── actions/                  # Next.js Server Actions ("use server")
-│       ├── collections.ts        # Collection + field + record CRUD
-│       ├── flows.ts              # Flow CRUD + triggerFlows()
-│       ├── extensions.ts         # Extension install/update/remove
-│       ├── webhooks.ts           # fireWebhooks()
-│       ├── audit.ts              # logAudit()
-│       ├── relations.ts          # Relation CRUD
-│       └── introspect.ts         # DB introspection + import
+│   ├── db.ts                       # Prisma client singleton
+│   ├── db-dynamic.ts               # Raw SQL DDL/DML for dynamic tables
+│   ├── db-introspect.ts            # information_schema reader
+│   ├── sse.ts                      # broadcast() → publish()
+│   ├── pubsub.ts                   # Redis pub/sub + local fallback
+│   ├── redis.ts                    # ioredis singletons (pub, sub, client)
+│   ├── queue.ts                    # BullMQ queue + worker factory
+│   ├── storage.ts                  # uploadFile() / deleteStoredFile() abstraction
+│   ├── email.ts                    # Resend integration
+│   ├── logger.ts                   # Pino structured logger
+│   ├── validate.ts                 # Input validation helpers
+│   ├── ratelimit.ts                # In-memory sliding window rate limiter
+│   ├── workspace-context.ts        # Cookie-based active workspace
+│   ├── templates.ts                # Page builder template library
+│   ├── auth.ts                     # NextAuth config
+│   ├── utils.ts                    # cn, slugify, etc.
+│   └── actions/
+│       ├── collections.ts
+│       ├── pages.ts                # + workspace filtering + broadcast
+│       ├── navigation.ts           # + workspace filtering
+│       ├── workspaces.ts           # + invite email
+│       ├── insights.ts             # Real analytics queries
+│       ├── files.ts                # + storage abstraction
+│       ├── forms.ts
+│       ├── flows.ts
+│       ├── webhooks.ts
+│       ├── audit.ts
+│       └── ...
 │
 ├── prisma/
-│   ├── schema.prisma
-│   └── migrations/
-│       ├── 20260513015339_init/
-│       ├── 20260521000001_collection_table_name/
-│       ├── 20260521000002_relations/
-│       ├── 20260529000001_flows/
-│       └── 20260529000002_extensions/
+│   └── schema.prisma
 │
+├── proxy.ts                        # Next.js 16 proxy middleware
+├── sentry.client.config.ts
+├── sentry.server.config.ts
+├── next.config.ts
+├── .env.example
+├── .github/
+│   └── workflows/ci.yml            # lint → typecheck → build → deploy
 └── public/
-    └── uploads/                  # Uploaded files + thumbnails
+    └── uploads/                    # Local file storage (dev / single-server)
 ```
 
 ---
 
-## 13. Getting Started
+## 19. Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
 - PostgreSQL database (Neon free tier works)
-- (Optional) GitHub OAuth app for SSO
+- (Optional) Redis for SSE multi-process mode and job queue
+- (Optional) AWS S3 / Cloudflare R2 for cloud file storage
 
 ### Installation
 
@@ -684,12 +598,9 @@ npm install
 ### Database Setup
 
 ```bash
-# Copy environment template
 cp .env.example .env.local
+# Edit .env.local — set DATABASE_URL
 
-# Edit .env.local — set DATABASE_URL to your Postgres connection string
-
-# Push schema and generate Prisma client
 npx prisma db push
 npx prisma generate
 ```
@@ -701,56 +612,91 @@ npm run dev
 # → http://localhost:3000
 ```
 
-On first run, create your admin account at `/signup` — subsequent registrations require existing admin approval.
+On first run, create your admin account at `/signup`. Subsequent registrations require admin approval.
 
-### Create your first API key
+### Health check
 
-1. Go to `/api-keys` in the dashboard
-2. Click **New API Key**
-3. Copy the key — it is shown only once
-4. Use it in requests: `Authorization: Bearer sk-live-...`
-
----
-
-## 14. Environment Variables
-
-```env
-# Required
-DATABASE_URL="postgresql://user:pass@host/db?sslmode=require"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-32-chars-minimum"
-
-# Optional — GitHub OAuth
-GITHUB_ID="your-github-app-id"
-GITHUB_SECRET="your-github-app-secret"
-
-# Optional — file upload path (default: public/uploads)
-UPLOAD_DIR="public/uploads"
+```bash
+curl http://localhost:3000/api/health
+# {"status":"healthy","checks":{"database":"ok","storage":"ok"},"ts":"..."}
 ```
 
 ---
 
-## 15. Roadmap
+## 20. Environment Variables
+
+```env
+# ── Database ─────────────────────────────────────────────────────────
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+
+# ── Auth ──────────────────────────────────────────────────────────────
+NEXTAUTH_URL="https://your-domain.com"
+NEXTAUTH_SECRET="generate with: openssl rand -base64 32"
+
+# Optional — GitHub OAuth
+GITHUB_ID=""
+GITHUB_SECRET=""
+
+# ── Storage (default: local disk) ─────────────────────────────────────
+STORAGE_PROVIDER="local"          # "local" | "s3"
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_REGION="us-east-1"
+AWS_BUCKET=""
+AWS_ENDPOINT=""                   # Cloudflare R2 or MinIO endpoint
+CDN_URL=""                        # e.g. https://cdn.yourdomain.com
+
+# ── Redis (enables multi-process SSE + BullMQ job queue) ──────────────
+REDIS_URL=""                      # e.g. redis://localhost:6379
+
+# ── Email ─────────────────────────────────────────────────────────────
+RESEND_API_KEY=""
+EMAIL_FROM="Genesis CMS <noreply@yourdomain.com>"
+
+# ── Monitoring ────────────────────────────────────────────────────────
+NEXT_PUBLIC_SENTRY_DSN=""
+SENTRY_DSN=""
+SENTRY_ORG=""
+SENTRY_PROJECT=""
+
+# ── CORS ──────────────────────────────────────────────────────────────
+CORS_ORIGIN="*"                   # Restrict in prod: "https://your-app.com"
+
+# ── Logging ───────────────────────────────────────────────────────────
+LOG_LEVEL="info"                  # "debug" | "info" | "warn" | "error"
+```
+
+---
+
+## 21. Roadmap
+
+All 23 phases complete.
 
 | Phase | Feature | Status |
 |---|---|---|
-| 1 | Dynamic real DB tables per collection | ✅ Done |
-| 2 | DB introspection — import existing tables | ✅ Done |
-| 3 | Relationships — M2O, O2M, M2M | ✅ Done |
-| 4 | Advanced REST API | ✅ Done |
-| 5 | GraphQL endpoint | ✅ Done |
-| 6 | Flows — visual automation builder | ✅ Done |
-| 7 | Extensions — plugin system | ✅ Done |
-| 8 | Drag & drop block reordering | 🔜 |
-| 9 | Style editor — colors, fonts, spacing per block | 🔜 |
-| 10 | Template library — pre-built page templates | 🔜 |
-| 11 | Domain + publish — one-click deploy | 🔜 |
-| 12 | Form builder → submissions into collections | 🔜 |
-| 13 | Multi-page navigation — menus, page links | 🔜 |
-| 14 | Real-time — live updates via WebSockets | 🔜 |
-| 15 | Multi-tenant — schema-per-tenant isolation | 🔜 |
-| 16 | Media transforms — resize/crop on the fly | 🔜 |
-| 17 | Insights & Analytics — real usage metrics | 🔜 |
+| 1 | Dynamic real DB tables per collection | ✅ |
+| 2 | DB introspection — import existing tables | ✅ |
+| 3 | Relationships — M2O, O2M, M2M | ✅ |
+| 4 | Advanced REST API — filter, sort, search, paginate | ✅ |
+| 5 | GraphQL endpoint — auto-generated schema | ✅ |
+| 6 | Flows — visual automation builder | ✅ |
+| 7 | Extensions — plugin system | ✅ |
+| 8 | Drag & drop block reordering in page editor | ✅ |
+| 9 | Style editor — colors, fonts, spacing per block | ✅ |
+| 10 | Template library — 5 pre-built page layouts | ✅ |
+| 11 | SEO & publishing — seoTitle, seoDesc, OpenGraph | ✅ |
+| 12 | Form builder — contact forms → DB submissions | ✅ |
+| 13 | Multi-page navigation — menus, page links | ✅ |
+| 14 | Real-time — SSE live updates across dashboard | ✅ |
+| 15 | Multi-tenant workspaces — members, plans, isolation | ✅ |
+| 16 | Media transforms — Sharp resize/crop/format API | ✅ |
+| 17 | Insights & Analytics — real page views + charts | ✅ |
+| 18 | Security hardening — proxy, rate limiting, CORS | ✅ |
+| 19 | Cloud storage — S3 / Cloudflare R2 abstraction | ✅ |
+| 20 | Redis layer — pub/sub SSE + BullMQ job queue | ✅ |
+| 21 | Reliability — Pino logging, error boundaries, health check | ✅ |
+| 22 | Workspace data isolation — workspaceId on content tables | ✅ |
+| 23 | Notifications & ops — Resend email, Sentry, GitHub Actions CI | ✅ |
 
 ---
 

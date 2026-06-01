@@ -192,7 +192,7 @@ export default function CreateRelationModal({
             />
             {type === "m2o" && (
               <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                A column with this name will be added to <span className="font-mono">{collectionLabel}</span>'s table.
+                A column with this name will be added to <span className="font-mono">{collectionLabel}</span>&apos;s table.
               </p>
             )}
             {type === "m2m" && (

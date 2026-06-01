@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Search, Bell, ChevronRight, User, LogOut,
   Settings, ChevronsUpDown, Menu, Sun, Moon, Command,
-  Plus, Edit2, Trash2, Database, Users, Globe, FolderOpen, Key, Wifi, WifiOff,
+  Database, Users, Globe, FolderOpen, Key, Wifi, WifiOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui";
@@ -141,9 +141,7 @@ const ACTION_COLOR: Record<string, string> = {
   update: "var(--info)",
   delete: "var(--danger)",
 };
-const ACTION_ICON: Record<string, React.ElementType> = {
-  create: Plus, update: Edit2, delete: Trash2,
-};
+
 const RESOURCE_ICON: Record<string, React.ElementType> = {
   record: Database, collection: Database, user: Users,
   webhook: Globe, api_key: Key, file: FolderOpen,

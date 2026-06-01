@@ -69,7 +69,7 @@ export function FormBlock({
           <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#111827", marginBottom: 8, margin: "0 0 8px" }}>
             {data.successMsg || "Message received!"}
           </h2>
-          <p style={{ color: "#6b7280", margin: 0 }}>We'll get back to you as soon as possible.</p>
+          <p style={{ color: "#6b7280", margin: 0 }}>We&apos;ll get back to you as soon as possible.</p>
         </div>
       </section>
     );

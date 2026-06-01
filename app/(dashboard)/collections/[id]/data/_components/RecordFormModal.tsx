@@ -31,6 +31,7 @@ function RelationInput({ field, value, onChange }: {
 
   useEffect(() => {
     if (!meta?.targetCollectionId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     getRecordLabels(meta.targetCollectionId).then((rows) => {
       setOptions(rows);
